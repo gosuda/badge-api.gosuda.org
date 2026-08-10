@@ -30,3 +30,24 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+
+# SvelteKit dependencies and intermediate output
+node_modules/
+.svelte-kit/
+
+# Local server executable
+/badge-api.gosuda.org
+
+# Local assistant skills and design metadata
+/.agents/
+/.hallmark/
+
+# Generated frontend distribution output
+/build/
+/dist/*
+!/dist/.gitkeep
+
+# Generated CGI executable
+/deployment/cgi-bin/*
+!/deployment/cgi-bin/.gitkeep

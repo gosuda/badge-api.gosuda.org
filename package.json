@@ -1,0 +1,22 @@
+{
+  "name": "badge-api-gosuda-org",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build:web": "vite build",
+    "build:server": "go build -o badge-api.gosuda.org .",
+    "build:cgi": "npm run build:web && go build -o deployment/cgi-bin/badge-api.gosuda.org.cgi .",
+    "build": "npm run build:web && npm run build:server",
+    "start": "node run.js",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-static": "^3.0.10",
+    "@sveltejs/kit": "^2.70.2",
+    "svelte": "^5.56.8",
+    "svelte-check": "^4.3.4",
+    "vite": "^8.2.1"
+  }
+}

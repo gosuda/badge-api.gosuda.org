@@ -1,0 +1,15 @@
+Options +ExecCGI -Indexes
+AddHandler cgi-script .cgi
+AcceptPathInfo On
+
+RewriteEngine On
+
+# badge-api.gosuda.org is the canonical deployment host.
+RewriteCond %{HTTP_HOST} !^badge-api\.gosuda\.org$ [NC]
+RewriteRule ^ https://badge-api.gosuda.org%{REQUEST_URI} [R=308,END,NE]
+
+# Do not rewrite the CGI executable into itself.
+RewriteRule ^cgi-bin/badge-api\.gosuda\.org\.cgi(?:/.*)?$ - [END]
+
+# The CGI binary embeds and serves the frontend, API, and health route.
+RewriteRule ^(.*)$ cgi-bin/badge-api.gosuda.org.cgi/$1 [END,QSA,PT]
