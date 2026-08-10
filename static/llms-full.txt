@@ -29,8 +29,9 @@ The API accepts 3-digit or 6-digit hexadecimal colors without a leading `#`, plu
 
 - Standard styles measure text with `github.com/mattn/go-runewidth`, including grapheme-aware handling for combining marks, CJK characters, and emoji sequences.
 - Standard SVG text uses `lengthAdjust="spacing"` to avoid stretching glyph shapes.
-- `old-school` renders a fixed 80×15 split-panel button with integer-aligned geometry and font-independent 3×5 bitmap paths.
-- `click-here` and `best-viewed` render fixed 88×31 buttons. Their supplied source SVG path and rect coordinates are embedded unchanged; reference phrases preserve the original artwork, while custom phrases replace only the text rectangle with bitmap paths.
+- `old-school` renders a fixed 80×15 split-panel button. Each label and message font size is calculated independently from its available width and height.
+- `click-here` and `best-viewed` render fixed 88×31 buttons. Their supplied reference phrases preserve the original embedded SVG coordinates. Custom phrases replace only the text rectangle with resolution-independent SVG text using an automatically fitted font size, `text-rendering="geometricPrecision"`, and `lengthAdjust="spacingAndGlyphs"`.
+- Because custom text remains vector SVG, small font sizes stay anti-aliased and scale cleanly without a fixed raster DPI.
 - `size` scales the SVG `width` and `height`; the internal `viewBox` and style proportions remain stable.
 - The maker offers a debounced live preview, exact size input, and switchable 1× or 2× inspection zoom.
 

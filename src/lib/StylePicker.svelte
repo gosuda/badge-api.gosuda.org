@@ -10,9 +10,9 @@
     { id: 'neon', name: 'Neon', note: 'Out after dark', sample: 'glow' },
     { id: 'glass', name: 'Glass', note: 'Feeling fancy', sample: 'fancy' },
     { id: 'flatbar', name: 'Flatbar', note: 'Big badge energy', sample: 'loud' },
-    { id: 'old-school', name: 'Old School 80×15', note: 'Split-panel pixel type', sample: 'button' },
-    { id: 'click-here', name: 'Click Here 88×31', note: 'Raised, loud, clickable', sample: 'here' },
-    { id: 'best-viewed', name: 'Best Viewed 88×31', note: 'Chrome-era nostalgia', sample: 'chrome' }
+    { id: 'old-school', name: 'Old School 80×15', note: 'Split-panel auto-fit type', sample: 'button' },
+    { id: 'click-here', name: 'Click Here 88×31', note: 'Raised, crisp, clickable', sample: 'here' },
+    { id: 'best-viewed', name: 'Best Viewed 88×31', note: 'Chrome-era auto-fit type', sample: 'chrome' }
   ];
 
   function sampleURL(style) {

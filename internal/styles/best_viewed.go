@@ -20,10 +20,10 @@ func renderBestViewed(options Options, label, message string) []byte {
 	if !strings.EqualFold(strings.TrimSpace(label), "viewed with") || !strings.EqualFold(strings.TrimSpace(message), "chrome") {
 		builder.WriteString(`<rect x="10" y="3" width="50" height="24" fill="#bcbcbc"/>`)
 		if label == "" {
-			writeBitmapText(&builder, message, 11, 10, 47, 2, 2, 1, "777777")
+			writeAdaptiveText(&builder, message, adaptiveTextBox{X: 11, Y: 5, Width: 47, Height: 20, MaxFontSize: 15}, "777777", true, true)
 		} else {
-			writeBitmapText(&builder, label, 11, 6, 47, 1, 1, 1, "0d0d0d")
-			writeBitmapText(&builder, message, 11, 15, 47, 2, 2, 1, "777777")
+			writeAdaptiveText(&builder, label, adaptiveTextBox{X: 11, Y: 4, Width: 47, Height: 8, MaxFontSize: 7}, "0d0d0d", true, true)
+			writeAdaptiveText(&builder, message, adaptiveTextBox{X: 11, Y: 13, Width: 47, Height: 13, MaxFontSize: 11}, "777777", true, true)
 		}
 	}
 	builder.WriteString(`</g></svg>`)

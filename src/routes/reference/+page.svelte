@@ -39,9 +39,9 @@ ETag: "<content hash>"`;
     ['neon', 'A focused glow around each color segment.'],
     ['glass', 'A layered sheen with a quiet border.'],
     ['flatbar', 'A 28 px uppercase bar inspired by larger badge styles.'],
-    ['old-school', 'Old School 80×15: a fixed split-panel button with customizable colors and font-independent 3×5 bitmap lettering.'],
-    ['click-here', 'Click Here 88×31: the supplied raised gray classic with its original pixel paths, maroon call-to-action, and red exclamation.'],
-    ['best-viewed', 'Best Viewed 88×31: the supplied BEST rail, two-line text layout, and Chrome artwork with original pixel paths.']
+    ['old-school', 'Old School 80×15: a fixed split-panel button with customizable colors and resolution-independent text that automatically shrinks to fit each panel.'],
+    ['click-here', 'Click Here 88×31: the supplied raised gray artwork for its reference phrase, with high-resolution auto-fit vector text for custom copy.'],
+    ['best-viewed', 'Best Viewed 88×31: the supplied BEST rail and Chrome artwork, with separately auto-scaled vector text for both custom lines.']
   ];
 
   function styleSampleURL(style) {
@@ -77,7 +77,7 @@ ETag: "<content hash>"`;
     ['errors', 'Errors']
   ];
 
-  const seoDescription = 'Read the Tiny Badge SVG API reference for endpoints, parameters, eleven styles including pixel-perfect 80×15 and 88×31 buttons, colors, 50–300% sizing, Unicode text width, ETags, immutable caching, examples, and errors.';
+  const seoDescription = 'Read the Tiny Badge SVG API reference for endpoints, parameters, eleven styles including classic 80×15 and 88×31 buttons with auto-scaling vector text, colors, 50–300% sizing, Unicode width, ETags, immutable caching, examples, and errors.';
   const referenceStructuredData = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -135,7 +135,7 @@ ETag: "<content hash>"`;
   <section class="reference-hero section-shell">
     <h1>Everything the SVG badge API understands.</h1>
     <p>
-      Query and path endpoints, eleven rendering styles including three pixel-perfect 80×15 and 88×31 classics, exact 50–300% sizing, four color controls, Unicode-aware text width, immutable cache headers, ETags, and practical examples.
+      Query and path endpoints, eleven rendering styles including three fixed-size classics with auto-scaling vector text, exact 50–300% sizing, four color controls, Unicode-aware width, immutable cache headers, ETags, and practical examples.
     </p>
   </section>
 

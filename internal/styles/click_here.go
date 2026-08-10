@@ -25,11 +25,7 @@ func renderClickHere(options Options, label, message string) []byte {
 	phrase := strings.TrimSpace(strings.TrimSpace(label) + " " + strings.TrimSpace(message))
 	if !strings.EqualFold(phrase, "click here") {
 		builder.WriteString(`<rect x="3" y="3" width="76" height="24" fill="#cccccc"/>`)
-		glyphs := fitBitmapText([]rune(strings.ToUpper(phrase)), 69, 2, 1)
-		if len(glyphs) > 0 {
-			textWidth := bitmapTextWidth(glyphs, 2, 1)
-			writeBitmapPath(&builder, glyphs, 5+(72-textWidth)/2, 10, 2, 2, 1, "3a0603")
-		}
+		writeAdaptiveText(&builder, phrase, adaptiveTextBox{X: 5, Y: 5, Width: 72, Height: 20, MaxFontSize: 11}, "3a0603", true, true)
 	}
 	builder.WriteString(`</g></svg>`)
 	return []byte(builder.String())

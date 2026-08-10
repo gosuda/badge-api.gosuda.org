@@ -29,7 +29,7 @@
     textColor: { r: 41, g: 39, b: 36 }
   };
 
-  const seoDescription = 'Create customizable SVG badges with eleven styles, including pixel-perfect 80×15 and 88×31 web buttons, exact 50–300% sizing, RGB, HSL, and OKLCH controls, Unicode-aware text width, immutable caching, and shareable URLs.';
+  const seoDescription = 'Create customizable SVG badges with eleven styles, including classic 80×15 and 88×31 web buttons with auto-scaling vector text, exact 50–300% sizing, RGB, HSL, and OKLCH controls, Unicode-aware width, immutable caching, and shareable URLs.';
   const homeStructuredData = {
     '@context': 'https://schema.org',
     '@graph': [

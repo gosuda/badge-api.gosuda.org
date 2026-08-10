@@ -212,17 +212,20 @@ func TestOldSchoolStyleUsesFixedPixelGeometry(t *testing.T) {
 		`shape-rendering="crispEdges"`,
 		`<rect width="80" height="15" fill="#a5a5a5"/>`,
 		`<rect x="1" y="1" width="78" height="13" fill="#fff"/>`,
-		`y="2" width="31" height="11" fill="#ff5a18"`,
+		`y="2" width="30" height="11" fill="#ff5a18"`,
 		`fill="#a8a979"`,
-		`<path fill="#ffffff"`,
+		`<text `,
+		`text-rendering="geometricPrecision"`,
+		`lengthAdjust="spacingAndGlyphs"`,
+		`>PIXEL</text>`,
 		`aria-label="PIXEL: BUTTON"`,
 	} {
 		if !strings.Contains(body, expected) {
 			t.Fatalf("SVG does not contain %q", expected)
 		}
 	}
-	if strings.Contains(body, "<text") {
-		t.Fatal("old-school SVG uses font-dependent text instead of bitmap paths")
+	if !strings.Contains(body, ">BUTTON</text>") {
+		t.Fatal("old-school SVG does not render the full message as adaptive vector text")
 	}
 
 	scaled := renderValidatedBadge(t, badgeOptions{Label: "pixel", Message: "button", Style: "old-school", Size: 200})

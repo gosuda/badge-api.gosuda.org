@@ -2,11 +2,11 @@
 
 > Tiny Badge is a free SVG badge generator and HTTP API at https://badge-api.gosuda.org/. It creates shareable badge image URLs from a label, message, style, exact size, and color settings.
 
-Tiny Badge is implemented in Go with `net/http` and `httprouter`. The visual maker is a static SvelteKit frontend. Badge responses are SVG images with immutable caching, content-derived ETags, CORS, Unicode-aware text measurement, and eleven rendering styles, including pixel-perfect 80×15 and 88×31 web buttons. Every pricing plan is $0.
+Tiny Badge is implemented in Go with `net/http` and `httprouter`. The visual maker is a static SvelteKit frontend. Badge responses are SVG images with immutable caching, content-derived ETags, CORS, Unicode-aware text measurement, and eleven rendering styles, including classic 80×15 and 88×31 buttons with auto-scaling vector text. Every pricing plan is $0.
 
 ## Primary pages
 
-- [SVG badge maker](https://badge-api.gosuda.org/): Interactive badge generator with eleven styles, including three pixel-perfect 80×15 and 88×31 classics, 50–300% sizing, 1×/2× preview, and separate Hex, RGB, HSL, and OKLCH color channels.
+- [SVG badge maker](https://badge-api.gosuda.org/): Interactive badge generator with eleven styles, including three fixed-size classics with auto-scaling vector text, 50–300% sizing, 1×/2× preview, and separate Hex, RGB, HSL, and OKLCH color channels.
 - [Pricing](https://badge-api.gosuda.org/pricing/): Solo, Team, Studio, and Enterprise plans; every plan and seat costs $0.
 - [API reference](https://badge-api.gosuda.org/reference/): Endpoints, parameters, styles, colors, URL encoding, caching, ETags, errors, and examples.
 

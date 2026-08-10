@@ -27,9 +27,9 @@ func renderOldSchool(options Options, label, message string) []byte {
 	}
 	writeOldSchoolPanel(&builder, messageX, messagePanelWidth, options.MessageColor)
 	if labelPanelWidth > 0 {
-		writeBitmapText(&builder, label, 2, 5, labelPanelWidth, 1, 1, 1, options.LabelTextColor)
+		writeAdaptiveText(&builder, label, adaptiveTextBox{X: 3, Y: 2, Width: float64(labelPanelWidth - 2), Height: 11, MaxFontSize: 7}, options.LabelTextColor, false, true)
 	}
-	writeBitmapText(&builder, message, messageX, 5, messagePanelWidth, 1, 1, 1, options.MessageTextColor)
+	writeAdaptiveText(&builder, message, adaptiveTextBox{X: float64(messageX + 1), Y: 2, Width: float64(messagePanelWidth - 2), Height: 11, MaxFontSize: 7}, options.MessageTextColor, false, true)
 	builder.WriteString(`</g></svg>`)
 	return []byte(builder.String())
 }
@@ -39,8 +39,8 @@ func oldSchoolPanelWidths(label, message string) (int, int) {
 		return 0, 76
 	}
 	const usableWidth = 75
-	labelNeeded := bitmapTextWidth([]rune(label), 1, 1) + 4
-	messageNeeded := bitmapTextWidth([]rune(message), 1, 1) + 4
+	labelNeeded := int(math.Ceil(measureText(label, 7))) + 4
+	messageNeeded := int(math.Ceil(measureText(message, 7))) + 4
 	totalNeeded := labelNeeded + messageNeeded
 	labelWidth := 0
 	if totalNeeded <= usableWidth {

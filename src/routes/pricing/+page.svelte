@@ -46,7 +46,7 @@
 
   const sharedBenefits = ['Unlimited badges', 'Every look and color tool', 'Links that are ready to travel'];
 
-  const seoDescription = 'Compare four free Tiny Badge plans. Every plan is $0 and includes unlimited SVG badges, eleven styles with pixel-perfect 80×15 and 88×31 buttons, exact sizing, and every color control.';
+  const seoDescription = 'Compare four free Tiny Badge plans. Every plan is $0 and includes unlimited SVG badges, eleven styles with classic 80×15 and 88×31 buttons, auto-scaling vector text, exact sizing, and every color control.';
   const pricingStructuredData = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -107,7 +107,7 @@
     <div>
       <h1>Four free SVG badge plans.<br />One suspiciously identical price.</h1>
       <p>
-        Every plan includes unlimited SVG badge URLs, all eleven styles—including three pixel-perfect 80×15 and 88×31 classics—exact size controls, Unicode-aware text, and the complete Hex, RGB, HSL, and OKLCH color editor.
+        Every plan includes unlimited SVG badge URLs, all eleven styles—including three classic fixed-size buttons with auto-scaling vector text—exact size controls, Unicode-aware text, and the complete Hex, RGB, HSL, and OKLCH color editor.
       </p>
     </div>
     <div class="billing-box">

@@ -92,9 +92,9 @@ The SVG keeps each style's original proportions. The `width` and `height` attrib
 | `neon` | Badge with a focused glow. |
 | `glass` | Layered highlight and border. |
 | `flatbar` | 28 px square badge with uppercase text. |
-| `old-school` | Fixed 80×15 split-panel button with 3×5 bitmap lettering. |
-| `click-here` | Fixed 88×31 raised button preserving the supplied classic artwork and red exclamation. |
-| `best-viewed` | Fixed 88×31 browser button preserving the supplied BEST rail and Chrome artwork. |
+| `old-school` | Fixed 80×15 split-panel button with resolution-independent text that automatically shrinks to fit. |
+| `click-here` | Fixed 88×31 raised reference artwork with auto-fit vector text for custom copy. |
+| `best-viewed` | Fixed 88×31 BEST rail and Chrome artwork with independently auto-scaled text lines. |
 
 Style example:
 
