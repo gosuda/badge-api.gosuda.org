@@ -20,6 +20,11 @@
   --color-success: oklch(60% 0.15 145);
   --color-error: oklch(58% 0.2 28);
   --color-focus: oklch(48% 0.17 265);
+  /* Text-safe variants. The base tokens above stay vivid for dots, borders,
+     and shadows; these darker forms clear WCAG AA as small text on paper. */
+  --color-success-text: oklch(48% 0.15 145);
+  --color-error-text: oklch(52% 0.2 28);
+  --color-accent-text: oklch(50% 0.17 95);
   --color-stage: oklch(22% 0.012 250);
   --color-stage-2: oklch(28% 0.014 250);
   --color-stage-ink: oklch(96% 0.008 95);

@@ -30,6 +30,7 @@ body {
   line-height: 1.55;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 button,
@@ -55,6 +56,35 @@ input:focus-visible,
 select:focus-visible {
   outline: 3px solid var(--color-focus);
   outline-offset: 3px;
+}
+
+/* Visible only while focused, so keyboard users can bypass the nav chrome. */
+.skip-link {
+  position: absolute;
+  z-index: var(--z-toast);
+  inset-block-start: var(--space-xs);
+  inset-inline-start: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-pill);
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* Announced by screen readers, never painted. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 ::selection {
@@ -546,7 +576,7 @@ main.banner-dismissed {
 }
 
 .field-help.error-text {
-  color: var(--color-error);
+  color: var(--color-error-text);
   font-weight: 700;
 }
 
@@ -768,7 +798,8 @@ main.banner-dismissed {
   min-height: 2.25rem;
   padding-inline: 0.65rem;
   border-radius: var(--radius-pill);
-  font-size: var(--text-xs);
+  /* iOS Safari zooms the page when a focused control is under 16px. */
+  font-size: var(--text-base);
   font-weight: 700;
 }
 
@@ -851,7 +882,8 @@ main.banner-dismissed {
   outline: 0;
   background: transparent;
   color: var(--color-ink);
-  font-size: var(--text-sm);
+  /* iOS Safari zooms the page when a focused control is under 16px. */
+  font-size: var(--text-base);
   font-variant-numeric: tabular-nums;
 }
 
@@ -886,6 +918,7 @@ main.banner-dismissed {
 .preview-card__head > div,
 .url-card__head > div {
   display: grid;
+  min-width: 0;
   gap: var(--space-2xs);
 }
 
@@ -908,7 +941,7 @@ main.banner-dismissed {
   display: inline-flex;
   align-items: center;
   gap: var(--space-xs);
-  color: var(--color-success) !important;
+  color: var(--color-success-text) !important;
   white-space: nowrap;
 }
 
@@ -921,7 +954,7 @@ main.banner-dismissed {
 }
 
 .status-dot.pending {
-  color: var(--color-accent-deep) !important;
+  color: var(--color-accent-text) !important;
 }
 
 .status-dot.pending::before {
