@@ -102,6 +102,7 @@
               step={channel.step}
               maxlength={channel.maxlength}
               value={channels[channel.key] ?? ''}
+              aria-label={`${label} ${channel.label}`}
               aria-invalid={invalid}
               aria-describedby={`${editorId}-help`}
               onfocus={() => (activeField = channel.key)}

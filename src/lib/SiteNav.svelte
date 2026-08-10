@@ -28,6 +28,7 @@
   }
 </script>
 
+<a class="skip-link" href="#top">Skip to main content</a>
 <header class:compact class:dismissed class="site-nav">
   <div class="announcement">
     <p>Every plan is $0. Finance has stopped returning our calls. <a href="/pricing/">See pricing</a></p>
