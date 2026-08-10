@@ -271,12 +271,12 @@
             <div class="field">
               <label class="field-label" for="label">First bit</label>
               <input id="label" class="text-input" bind:value={label} maxlength="64" placeholder="tiny" />
-              <p class="field-help">A short hello on the left.</p>
+              <p class="field-help">A short hello on the left. Sent as <code>label</code>.</p>
             </div>
             <div class="field">
               <label class="field-label" for="message">Main bit</label>
               <input id="message" class="text-input" bind:value={message} maxlength="128" required placeholder="but mighty" />
-              <p class="field-help">The good part goes on the right.</p>
+              <p class="field-help">The good part goes on the right. Sent as <code>message</code>.</p>
             </div>
           </div>
         </section>
@@ -349,16 +349,14 @@
               <span>Right this minute</span>
               <strong>Your badge</strong>
             </div>
-            <span class:pending={previewPending} class="status-dot">{previewPending ? 'Updating…' : 'Live preview'}</span>
+            <span class:pending={previewPending} class="status-dot" role="status" aria-live="polite">{previewPending ? 'Updating…' : 'Live preview'}</span>
           </div>
           <div class="preview-stage">
             <div class="preview-zoom-switch" role="group" aria-label="Preview magnification">
               <button class:active={previewZoom === 1} type="button" aria-pressed={previewZoom === 1} onclick={() => (previewZoom = 1)}>1×</button>
               <button class:active={previewZoom === 2} type="button" aria-pressed={previewZoom === 2} onclick={() => (previewZoom = 2)}>2×</button>
             </div>
-            {#key previewPath}
-              <img class="badge-preview" src={previewPath} alt={`${requestState.label}: ${requestState.message}`} style={`--preview-zoom: ${previewZoom}`} />
-            {/key}
+            <img class="badge-preview" src={previewPath} alt={`${requestState.label}: ${requestState.message}`} style={`--preview-zoom: ${previewZoom}`} />
           </div>
           <div class="preview-meta">
             <span>{requestState.size}% scale</span>
@@ -414,6 +412,9 @@
               {#if burst && copyFormat === 'markdown'}<span class="star-burst" aria-hidden="true"></span>{/if}
             </button>
           </div>
+          <p class="visually-hidden" role="status" aria-live="polite">
+            {copyState === 'success' ? `${copyFormat === 'markdown' ? 'Markdown' : 'URL'} copied to clipboard` : copyState === 'error' ? 'Copy failed. Try again.' : ''}
+          </p>
           <p class="cache-note">Use the URL anywhere, or paste the Markdown straight into a README.</p>
         </div>
       </aside>
