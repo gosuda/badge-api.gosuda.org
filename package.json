@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "vite dev",
     "build:web": "vite build",
-    "build:server": "go build -o badge-api.gosuda.org .",
-    "build:cgi": "npm run build:web && go build -o deployment/cgi-bin/badge-api.gosuda.org.cgi .",
+    "build:server": "go build -trimpath -ldflags='-s -w' -o badge-api.gosuda.org .",
+    "build:cgi": "npm run build:web && go build -trimpath -ldflags='-s -w' -o deployment/cgi-bin/badge-api.gosuda.org.cgi .",
+    "build:cgi:linux-amd64": "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 npm run build:cgi",
     "build": "npm run build:web && npm run build:server",
     "start": "node run.js",
     "check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json"

@@ -16,10 +16,12 @@ The generated executable is:
 deployment/cgi-bin/badge-api.gosuda.org.cgi
 ```
 
-For a Linux AMD64 shared host, cross-compile from another platform with:
+Production builds use `-trimpath -ldflags='-s -w'` to remove local source paths, symbol tables, and DWARF debug data from the executable.
+
+For a Linux AMD64 shared host, use the reproducible cross-compilation script:
 
 ```sh
-GOOS=linux GOARCH=amd64 npm run build:cgi
+npm run build:cgi:linux-amd64
 ```
 
 Confirm the operating system and architecture required by the hosting provider before uploading.

@@ -51,3 +51,6 @@ node_modules/
 # Generated CGI executable
 /deployment/cgi-bin/*
 !/deployment/cgi-bin/.gitkeep
+
+# Local deployment credentials and destination
+/deploy.sh
