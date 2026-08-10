@@ -32,7 +32,7 @@
     {#each styles as style}
       <label class:selected={value === style.id} class="style-option">
         <input type="radio" name="badge-style" value={style.id} bind:group={value} />
-        <span class="style-option__preview"><img src={sampleURL(style)} alt="" /></span>
+        <span class="style-option__preview"><img src={sampleURL(style)} alt="" loading="lazy" decoding="async" /></span>
         <span class="style-option__copy">
           <strong>{style.name}</strong>
           <small>{style.note}</small>

@@ -18,6 +18,12 @@
     glass: 24,
     flatbar: 28
   };
+  const defaultColors = {
+    labelColor: { r: 41, g: 39, b: 36 },
+    color: { r: 214, g: 239, b: 83 },
+    labelTextColor: { r: 255, g: 255, b: 255 },
+    textColor: { r: 41, g: 39, b: 36 }
+  };
 
   let label = $state('tiny');
   let message = $state('but mighty');
@@ -25,43 +31,68 @@
   let size = $state(100);
   let sizeText = $state('100');
   let sizeInputFocused = $state(false);
-  let colors = $state({
-    labelColor: { r: 41, g: 39, b: 36 },
-    color: { r: 214, g: 239, b: 83 },
-    labelTextColor: { r: 255, g: 255, b: 255 },
-    textColor: { r: 41, g: 39, b: 36 }
+  let colors = $state(copyColors(defaultColors));
+  let requestState = $state({
+    label: 'tiny',
+    message: 'but mighty',
+    style: 'flat',
+    size: 100,
+    colors: copyColors(defaultColors)
   });
+  let previewZoom = $state(2);
+  let previewPending = $state(false);
   let origin = $state('');
   let copyState = $state('idle');
   let bannerDismissed = $state(false);
   let burst = $state(false);
 
-  const previewHeight = $derived((styleHeights[style] * size) / 100);
+  const previewHeight = $derived((styleHeights[requestState.style] * requestState.size) / 100);
   const exactSizeValid = $derived(Number.isInteger(Number(sizeText)) && Number(sizeText) >= minSize && Number(sizeText) <= maxSize);
 
   $effect(() => {
     if (!sizeInputFocused) sizeText = String(size);
   });
 
-  const badgePath = $derived.by(() => {
-    const query = new URLSearchParams({
-      label,
-      message,
-      style,
-      size: String(size),
-      labelColor: rgbToHex(colors.labelColor).slice(1),
-      color: rgbToHex(colors.color).slice(1),
-      labelTextColor: rgbToHex(colors.labelTextColor).slice(1),
-      textColor: rgbToHex(colors.textColor).slice(1)
-    });
-    return `/badge.svg?${query}`;
+  $effect(() => {
+    const next = { label, message, style, size, colors: copyColors(colors) };
+    previewPending = true;
+    const timeout = setTimeout(() => {
+      requestState = next;
+      previewPending = false;
+    }, 220);
+    return () => clearTimeout(timeout);
   });
 
+  const badgePath = $derived(buildBadgePath({ label, message, style, size, colors }));
+  const previewPath = $derived(buildBadgePath(requestState));
   const badgeURL = $derived(origin ? `${origin}${badgePath}` : badgePath);
 
   onMount(() => {
     origin = window.location.origin;
   });
+
+  function copyColors(source) {
+    return {
+      labelColor: { ...source.labelColor },
+      color: { ...source.color },
+      labelTextColor: { ...source.labelTextColor },
+      textColor: { ...source.textColor }
+    };
+  }
+
+  function buildBadgePath(options) {
+    const query = new URLSearchParams({
+      label: options.label,
+      message: options.message,
+      style: options.style,
+      size: String(options.size),
+      labelColor: rgbToHex(options.colors.labelColor).slice(1),
+      color: rgbToHex(options.colors.color).slice(1),
+      labelTextColor: rgbToHex(options.colors.labelTextColor).slice(1),
+      textColor: rgbToHex(options.colors.textColor).slice(1)
+    });
+    return `/badge.svg?${query}`;
+  }
 
 
   function setColor(key, value) {
@@ -181,44 +212,40 @@
         <section class="control-section">
           <div class="section-title-row">
             <h3>Size</h3>
-            <output class="size-readout" for="badge-size">{size}%</output>
           </div>
           <p id="size-help" class="control-intro">Slide in broad strokes, then type the exact percentage when you want to be picky.</p>
           <div class="size-control">
-            <label class="size-slider-field" for="badge-size">
-              <span class="field-label">Badge scale</span>
+            <span id="badge-size-label" class="field-label">Badge scale</span>
+            <input
+              id="badge-size"
+              class="size-slider"
+              type="range"
+              min={minSize}
+              max={maxSize}
+              step="5"
+              value={size}
+              aria-labelledby="badge-size-label"
+              aria-describedby="size-help"
+              oninput={setSizeFromRange}
+            />
+            <span class:error={!exactSizeValid} class="size-exact-control">
               <input
-                id="badge-size"
-                class="size-slider"
-                type="range"
+                id="badge-size-exact"
+                type="number"
                 min={minSize}
                 max={maxSize}
-                step="5"
-                value={size}
+                step="1"
+                value={sizeText}
+                aria-label="Exact badge scale percentage"
+                aria-invalid={!exactSizeValid}
                 aria-describedby="size-help"
-                oninput={setSizeFromRange}
+                onfocus={() => (sizeInputFocused = true)}
+                oninput={editExactSize}
+                onblur={blurExactSize}
               />
-              <span class="size-range"><span>{minSize}%</span><span>{maxSize}%</span></span>
-            </label>
-            <label class="size-exact-field" for="badge-size-exact">
-              <span class="field-label">Exact value</span>
-              <span class:error={!exactSizeValid} class="size-exact-control">
-                <input
-                  id="badge-size-exact"
-                  type="number"
-                  min={minSize}
-                  max={maxSize}
-                  step="1"
-                  value={sizeText}
-                  aria-invalid={!exactSizeValid}
-                  aria-describedby="size-help"
-                  onfocus={() => (sizeInputFocused = true)}
-                  oninput={editExactSize}
-                  onblur={blurExactSize}
-                />
-                <span aria-hidden="true">%</span>
-              </span>
-            </label>
+              <span aria-hidden="true">%</span>
+            </span>
+            <span class="size-range"><span>{minSize}%</span><span>{maxSize}%</span></span>
           </div>
         </section>
 
@@ -243,16 +270,19 @@
               <span>Right this minute</span>
               <strong>Your badge</strong>
             </div>
-            <span class="status-dot">Live preview</span>
+            <span class:pending={previewPending} class="status-dot">{previewPending ? 'Updating…' : 'Live preview'}</span>
           </div>
           <div class="preview-stage">
-            <span class="preview-scale-note">2× inspection view</span>
-            {#key badgePath}
-              <img class="badge-preview" src={badgePath} alt={`${label}: ${message}`} />
+            <div class="preview-zoom-switch" role="group" aria-label="Preview magnification">
+              <button class:active={previewZoom === 1} type="button" aria-pressed={previewZoom === 1} onclick={() => (previewZoom = 1)}>1×</button>
+              <button class:active={previewZoom === 2} type="button" aria-pressed={previewZoom === 2} onclick={() => (previewZoom = 2)}>2×</button>
+            </div>
+            {#key previewPath}
+              <img class="badge-preview" src={previewPath} alt={`${requestState.label}: ${requestState.message}`} style={`--preview-zoom: ${previewZoom}`} />
             {/key}
           </div>
           <div class="preview-meta">
-            <span>{size}% scale</span>
+            <span>{requestState.size}% scale</span>
             <span>{formatPixels(previewHeight)} px tall</span>
           </div>
         </div>
