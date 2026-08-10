@@ -6,11 +6,12 @@
 
   let bannerDismissed = $state(false);
 
-  const queryExample = 'https://badge.example.com/badge.svg?label=build&message=passing&style=flatbar&size=125';
-  const pathExample = 'https://badge.example.com/badge/release/stable.svg';
-  const markdownExample = '![Build status](https://badge.example.com/badge.svg?label=build&message=passing)';
-  const htmlExample = '<img src="https://badge.example.com/badge.svg?label=build&message=passing" alt="Build: passing">';
-  const curlExample = "curl -o badge.svg 'https://badge.example.com/badge.svg?label=build&message=passing&style=flatbar'";
+  const productionOrigin = 'https://badge-api.gosuda.org';
+  const queryExample = `${productionOrigin}/badge.svg?label=build&message=passing&style=flatbar&size=125`;
+  const pathExample = `${productionOrigin}/badge/release/stable.svg`;
+  const markdownExample = `![Build status](${productionOrigin}/badge.svg?label=build&message=passing)`;
+  const htmlExample = `<img src="${productionOrigin}/badge.svg?label=build&message=passing" alt="Build: passing">`;
+  const curlExample = `curl -o badge.svg '${productionOrigin}/badge.svg?label=build&message=passing&style=flatbar'`;
   const responseHeaders = `Content-Type: image/svg+xml; charset=utf-8
 Cache-Control: public, max-age=315360000, immutable
 CDN-Cache-Control: public, max-age=315360000, immutable
@@ -131,9 +132,9 @@ ETag: "<content hash>"`;
           Tiny Badge returns a deterministic SVG image from the label, message, style, size, and colors encoded in the request URL. Unicode graphemes are measured with <code>go-runewidth</code>, successful responses use long-lived immutable caching and content-derived ETags, and the same URL always describes the same badge.
         </p>
         <div class="reference-callout">
-          <strong>Placeholder origin</strong>
-          <code>https://badge.example.com</code>
-          <p>Replace this origin with the hostname of your deployment.</p>
+          <strong>Production origin</strong>
+          <code>{productionOrigin}</code>
+          <p>Every example on this page is ready to use against the live Tiny Badge service.</p>
         </div>
       </section>
 

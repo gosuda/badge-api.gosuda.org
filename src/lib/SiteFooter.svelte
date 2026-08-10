@@ -4,5 +4,6 @@
     <a href="/">Maker</a>
     <a href="/pricing/">Pricing</a>
     <a href="/reference/">API Reference</a>
+    <a href="https://github.com/gosuda/badge-api.gosuda.org" target="_blank" rel="noreferrer">GitHub ↗</a>
   </nav>
 </footer>

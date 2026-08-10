@@ -106,6 +106,7 @@
   let previewPending = $state(false);
   let origin = $state('');
   let copyState = $state('idle');
+  let copyFormat = $state('url');
   let bannerDismissed = $state(false);
   let burst = $state(false);
 
@@ -129,6 +130,7 @@
   const badgePath = $derived(buildBadgePath({ label, message, style, size, colors }));
   const previewPath = $derived(buildBadgePath(requestState));
   const badgeURL = $derived(origin ? `${origin}${badgePath}` : badgePath);
+  const markdownEmbed = $derived(`![${markdownAlt(label, message)}](${badgeURL})`);
 
   onMount(() => {
     origin = window.location.origin;
@@ -181,11 +183,24 @@
     return Number.isInteger(value) ? String(value) : value.toFixed(1);
   }
 
-  async function copyURL() {
+  function markdownAlt(labelText, messageText) {
+    const text = [labelText, messageText].filter(Boolean).join(': ') || 'Tiny Badge';
+    return text.replace(/([\\\[\]])/g, '\\$1');
+  }
+
+  function copyLabel(format, idleLabel) {
+    if (copyFormat !== format || copyState === 'idle') return idleLabel;
+    if (copyState === 'loading') return 'Copying…';
+    if (copyState === 'success') return format === 'markdown' ? 'Markdown copied' : 'URL copied';
+    return format === 'markdown' ? 'Try Markdown again' : 'Try URL again';
+  }
+
+  async function copyBadge(format) {
     if (copyState === 'loading') return;
+    copyFormat = format;
     copyState = 'loading';
     try {
-      await navigator.clipboard.writeText(badgeURL);
+      await navigator.clipboard.writeText(format === 'markdown' ? markdownEmbed : badgeURL);
       copyState = 'success';
       burst = true;
       window.setTimeout(() => (burst = false), 460);
@@ -356,30 +371,47 @@
             </div>
             <a class="download-link" href={badgePath} download="badge.svg">Save a copy</a>
           </div>
-          <div class="url-output">
-            <p>Your badge is packed and ready to go.</p>
+          <a class="url-output" href={badgePath} target="_blank" rel="noreferrer">
+            <span class="url-output__preview">
+              <img src={previewPath} alt={`${requestState.label}: ${requestState.message}`} />
+            </span>
+            <span class="url-output__copy">
+              <strong>Open the live SVG</strong>
+              <code>{badgeURL}</code>
+            </span>
+            <span class="url-output__arrow" aria-hidden="true">↗</span>
+          </a>
+          <div class="markdown-output">
+            <span>Markdown</span>
+            <code>{markdownEmbed}</code>
           </div>
-          <button
-            class:success={copyState === 'success'}
-            class:error={copyState === 'error'}
-            class:loading={copyState === 'loading'}
-            class="btn btn--copy"
-            type="button"
-            disabled={copyState === 'loading'}
-            onclick={copyURL}
-          >
-            {#if copyState === 'loading'}
-              Picking it up…
-            {:else if copyState === 'success'}
-              All yours
-            {:else if copyState === 'error'}
-              Try that once more
-            {:else}
-              Copy my link
-            {/if}
-            {#if burst}<span class="star-burst" aria-hidden="true"></span>{/if}
-          </button>
-          <p class="cache-note">Paste it wherever your badge deserves a tiny bit of attention.</p>
+          <div class="copy-actions">
+            <button
+              class:success={copyState === 'success' && copyFormat === 'url'}
+              class:error={copyState === 'error' && copyFormat === 'url'}
+              class:loading={copyState === 'loading' && copyFormat === 'url'}
+              class="btn btn--copy"
+              type="button"
+              disabled={copyState === 'loading'}
+              onclick={() => copyBadge('url')}
+            >
+              {copyLabel('url', 'Copy URL')}
+              {#if burst && copyFormat === 'url'}<span class="star-burst" aria-hidden="true"></span>{/if}
+            </button>
+            <button
+              class:success={copyState === 'success' && copyFormat === 'markdown'}
+              class:error={copyState === 'error' && copyFormat === 'markdown'}
+              class:loading={copyState === 'loading' && copyFormat === 'markdown'}
+              class="btn btn--copy btn--copy--secondary"
+              type="button"
+              disabled={copyState === 'loading'}
+              onclick={() => copyBadge('markdown')}
+            >
+              {copyLabel('markdown', 'Copy Markdown')}
+              {#if burst && copyFormat === 'markdown'}<span class="star-burst" aria-hidden="true"></span>{/if}
+            </button>
+          </div>
+          <p class="cache-note">Use the URL anywhere, or paste the Markdown straight into a README.</p>
         </div>
       </aside>
     </div>
