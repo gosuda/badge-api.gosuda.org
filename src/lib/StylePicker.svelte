@@ -9,18 +9,36 @@
     { id: 'outline', name: 'Outline', note: 'Neatly dressed', sample: 'tidy' },
     { id: 'neon', name: 'Neon', note: 'Out after dark', sample: 'glow' },
     { id: 'glass', name: 'Glass', note: 'Feeling fancy', sample: 'fancy' },
-    { id: 'flatbar', name: 'Flatbar', note: 'Big badge energy', sample: 'loud' }
+    { id: 'flatbar', name: 'Flatbar', note: 'Big badge energy', sample: 'loud' },
+    { id: 'old-school', name: 'Old School 80×15', note: 'Split-panel pixel type', sample: 'button' },
+    { id: 'click-here', name: 'Click Here 88×31', note: 'Raised, loud, clickable', sample: 'here' },
+    { id: 'best-viewed', name: 'Best Viewed 88×31', note: 'Chrome-era nostalgia', sample: 'chrome' }
   ];
 
   function sampleURL(style) {
-    const query = new URLSearchParams({
+    const presets = {
+      flatbar: { label: 'mood', message: 'loud', size: '100', labelColor: '292724', color: '7c5cff', textColor: 'ffffff' },
+      'old-school': { label: 'pixel', message: 'button', size: '200', labelColor: 'ff5a18', color: 'a8a979', textColor: 'ffffff' },
+      'click-here': { label: 'click', message: 'here', size: '200', labelColor: '292724', color: 'd6ef53', textColor: '292724' },
+      'best-viewed': { label: 'viewed with', message: 'chrome', size: '200', labelColor: '292724', color: 'd6ef53', textColor: '292724' }
+    };
+    const preset = presets[style.id] ?? {
       label: 'mood',
       message: style.sample,
-      style: style.id,
+      size: '100',
       labelColor: '292724',
-      color: style.id === 'flatbar' ? '7c5cff' : 'd6ef53',
+      color: 'd6ef53',
+      textColor: '292724'
+    };
+    const query = new URLSearchParams({
+      label: preset.label,
+      message: preset.message,
+      style: style.id,
+      size: preset.size,
+      labelColor: preset.labelColor,
+      color: preset.color,
       labelTextColor: 'ffffff',
-      textColor: style.id === 'flatbar' ? 'ffffff' : '292724'
+      textColor: preset.textColor
     });
     return `/badge.svg?${query}`;
   }

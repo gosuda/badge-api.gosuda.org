@@ -17,7 +17,10 @@
     outline: 22,
     neon: 24,
     glass: 24,
-    flatbar: 28
+    flatbar: 28,
+    'old-school': 15,
+    'click-here': 31,
+    'best-viewed': 31
   };
   const defaultColors = {
     labelColor: { r: 41, g: 39, b: 36 },
@@ -26,7 +29,7 @@
     textColor: { r: 41, g: 39, b: 36 }
   };
 
-  const seoDescription = 'Create customizable SVG badges with eight styles, exact 50–300% sizing, RGB, HSL, and OKLCH color controls, Unicode-aware text width, immutable caching, and shareable URLs.';
+  const seoDescription = 'Create customizable SVG badges with eleven styles, including pixel-perfect 80×15 and 88×31 web buttons, exact 50–300% sizing, RGB, HSL, and OKLCH controls, Unicode-aware text width, immutable caching, and shareable URLs.';
   const homeStructuredData = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -61,7 +64,7 @@
           priceCurrency: 'USD'
         },
         featureList: [
-          'Eight SVG badge styles',
+          'Eleven SVG badge styles, including fixed 80 by 15 and 88 by 31 pixel buttons',
           'Exact size scaling from 50 to 300 percent',
           'Hex, RGB, HSL, and OKLCH color controls',
           'Unicode-aware text measurement',
@@ -235,7 +238,7 @@
     </div>
     <div class="hero__proof" aria-label="A few cheerful facts">
       <div class="proof-item proof-item--pear">
-        <strong>8</strong>
+        <strong>11</strong>
         <span>looks to try on</span>
       </div>
       <div class="proof-item proof-item--cyan">
@@ -253,7 +256,7 @@
     <div class="section-shell designer-heading">
       <div>
         <h2>Make your SVG badge</h2>
-        <p>Tweak the words, choose one of eight styles, set an exact size, and tune every color channel.</p>
+        <p>Tweak the words, choose one of eleven styles, set an exact size, and tune every color channel.</p>
       </div>
       <code>No wrong turns</code>
     </div>

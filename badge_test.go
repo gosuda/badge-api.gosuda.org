@@ -195,18 +195,76 @@ func TestBadgeHandlerAppliesExactSize(t *testing.T) {
 	}
 }
 
-func TestMeasureTextUsesUnicodeDisplayWidth(t *testing.T) {
-	plain := measureText("e", 11)
-	if got := measureText("e\u0301", 11); got != plain {
-		t.Fatalf("combining text width = %v, want %v", got, plain)
+func TestOldSchoolStyleUsesFixedPixelGeometry(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "/badge.svg?label=pixel&message=button&style=old-school&labelColor=ff5a18&color=a8a979&size=100", nil)
+	response := httptest.NewRecorder()
+	newHandler().ServeHTTP(response, request)
+	if response.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", response.Code, http.StatusOK)
 	}
 
-	wide := measureText("界", 11)
-	if wide <= measureText("a", 11) {
-		t.Fatalf("CJK width = %v, want wider than ASCII", wide)
+	root := parseSVGRoot(t, response.Body.Bytes())
+	if root.Width != "80" || root.Height != "15" || root.ViewBox != "0 0 80 15" {
+		t.Fatalf("root = width %q, height %q, viewBox %q; want 80, 15, 0 0 80 15", root.Width, root.Height, root.ViewBox)
 	}
-	if emoji := measureText("👩‍💻", 11); emoji != wide {
-		t.Fatalf("emoji grapheme width = %v, want %v", emoji, wide)
+	body := response.Body.String()
+	for _, expected := range []string{
+		`shape-rendering="crispEdges"`,
+		`<rect width="80" height="15" fill="#a5a5a5"/>`,
+		`<rect x="1" y="1" width="78" height="13" fill="#fff"/>`,
+		`y="2" width="31" height="11" fill="#ff5a18"`,
+		`fill="#a8a979"`,
+		`<path fill="#ffffff"`,
+		`aria-label="PIXEL: BUTTON"`,
+	} {
+		if !strings.Contains(body, expected) {
+			t.Fatalf("SVG does not contain %q", expected)
+		}
+	}
+	if strings.Contains(body, "<text") {
+		t.Fatal("old-school SVG uses font-dependent text instead of bitmap paths")
+	}
+
+	scaled := renderValidatedBadge(t, badgeOptions{Label: "pixel", Message: "button", Style: "old-school", Size: 200})
+	scaledRoot := parseSVGRoot(t, scaled)
+	if scaledRoot.Width != "160" || scaledRoot.Height != "30" || scaledRoot.ViewBox != root.ViewBox {
+		t.Fatalf("scaled root = width %q, height %q, viewBox %q; want 160, 30, %q", scaledRoot.Width, scaledRoot.Height, scaledRoot.ViewBox, root.ViewBox)
+	}
+}
+
+func TestClassicPixelStylesUseFixed88x31Geometry(t *testing.T) {
+	tests := []struct {
+		style   string
+		label   string
+		message string
+		marker  string
+	}{
+		{style: "click-here", label: "click", message: "here", marker: `fill="#ea3323"`},
+		{style: "best-viewed", label: "viewed with", message: "chrome", marker: `fill="#64a8d2"`},
+	}
+
+	for _, test := range tests {
+		t.Run(test.style, func(t *testing.T) {
+			request := httptest.NewRequest(http.MethodGet, "/badge.svg?label="+strings.ReplaceAll(test.label, " ", "%20")+"&message="+test.message+"&style="+test.style+"&size=100", nil)
+			response := httptest.NewRecorder()
+			newHandler().ServeHTTP(response, request)
+			if response.Code != http.StatusOK {
+				t.Fatalf("status = %d, want %d", response.Code, http.StatusOK)
+			}
+			root := parseSVGRoot(t, response.Body.Bytes())
+			if root.Width != "88" || root.Height != "31" || root.ViewBox != "0 0 88 31" {
+				t.Fatalf("root = width %q, height %q, viewBox %q; want 88, 31, 0 0 88 31", root.Width, root.Height, root.ViewBox)
+			}
+			if body := response.Body.String(); !strings.Contains(body, test.marker) || strings.Contains(body, "<text") {
+				t.Fatalf("SVG does not preserve expected pixel artwork marker %q", test.marker)
+			}
+
+			scaled := renderValidatedBadge(t, badgeOptions{Label: test.label, Message: test.message, Style: test.style, Size: 200})
+			scaledRoot := parseSVGRoot(t, scaled)
+			if scaledRoot.Width != "176" || scaledRoot.Height != "62" || scaledRoot.ViewBox != root.ViewBox {
+				t.Fatalf("scaled root = width %q, height %q, viewBox %q; want 176, 62, %q", scaledRoot.Width, scaledRoot.Height, scaledRoot.ViewBox, root.ViewBox)
+			}
+		})
 	}
 }
 

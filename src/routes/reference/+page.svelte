@@ -22,7 +22,7 @@ ETag: "<content hash>"`;
   const parameters = [
     { name: 'message', required: 'Required', fallback: '—', detail: 'Main badge text. Maximum 128 characters.' },
     { name: 'label', required: 'Optional', fallback: 'Empty', detail: 'Left-side badge text. Maximum 64 characters.' },
-    { name: 'style', required: 'Optional', fallback: 'flat', detail: 'Selects one of the eight rendering styles.' },
+    { name: 'style', required: 'Optional', fallback: 'flat', detail: 'Selects one of the eleven rendering styles.' },
     { name: 'size', required: 'Optional', fallback: '100', detail: 'Scales the whole badge from 50 to 300 percent. Integer values only.' },
     { name: 'labelColor', required: 'Optional', fallback: '555555', detail: 'Background color for the label segment.' },
     { name: 'color', required: 'Optional', fallback: '44cc11', detail: 'Background color for the message segment.' },
@@ -38,8 +38,31 @@ ETag: "<content hash>"`;
     ['outline', 'A framed surface with a brighter inner edge.'],
     ['neon', 'A focused glow around each color segment.'],
     ['glass', 'A layered sheen with a quiet border.'],
-    ['flatbar', 'A 28 px uppercase bar inspired by larger badge styles.']
+    ['flatbar', 'A 28 px uppercase bar inspired by larger badge styles.'],
+    ['old-school', 'Old School 80×15: a fixed split-panel button with customizable colors and font-independent 3×5 bitmap lettering.'],
+    ['click-here', 'Click Here 88×31: the supplied raised gray classic with its original pixel paths, maroon call-to-action, and red exclamation.'],
+    ['best-viewed', 'Best Viewed 88×31: the supplied BEST rail, two-line text layout, and Chrome artwork with original pixel paths.']
   ];
+
+  function styleSampleURL(style) {
+    const presets = {
+      'old-school': { label: 'pixel', message: 'button', size: '200', labelColor: 'ff5a18', color: 'a8a979' },
+      'click-here': { label: 'click', message: 'here', size: '200', labelColor: '555555', color: '44cc11' },
+      'best-viewed': { label: 'viewed with', message: 'chrome', size: '200', labelColor: '555555', color: '44cc11' }
+    };
+    const preset = presets[style[0]] ?? { label: 'style', message: style[0], size: '100', labelColor: '555555', color: '44cc11' };
+    const query = new URLSearchParams({
+      label: preset.label,
+      message: preset.message,
+      style: style[0],
+      size: preset.size,
+      labelColor: preset.labelColor,
+      color: preset.color,
+      labelTextColor: 'ffffff',
+      textColor: 'ffffff'
+    });
+    return `/badge.svg?${query}`;
+  }
 
   const namedColors = ['brightgreen', 'green', 'yellowgreen', 'yellow', 'orange', 'red', 'blue', 'grey', 'gray', 'lightgrey', 'lightgray', 'success', 'important', 'critical', 'informational', 'inactive'];
 
@@ -54,7 +77,7 @@ ETag: "<content hash>"`;
     ['errors', 'Errors']
   ];
 
-  const seoDescription = 'Read the Tiny Badge SVG API reference for endpoints, parameters, eight styles, colors, 50–300% sizing, Unicode text width, ETags, immutable caching, examples, and errors.';
+  const seoDescription = 'Read the Tiny Badge SVG API reference for endpoints, parameters, eleven styles including pixel-perfect 80×15 and 88×31 buttons, colors, 50–300% sizing, Unicode text width, ETags, immutable caching, examples, and errors.';
   const referenceStructuredData = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -112,7 +135,7 @@ ETag: "<content hash>"`;
   <section class="reference-hero section-shell">
     <h1>Everything the SVG badge API understands.</h1>
     <p>
-      Query and path endpoints, eight rendering styles, exact 50–300% sizing, four color controls, Unicode-aware text width, immutable cache headers, ETags, and practical examples.
+      Query and path endpoints, eleven rendering styles including three pixel-perfect 80×15 and 88×31 classics, exact 50–300% sizing, four color controls, Unicode-aware text width, immutable cache headers, ETags, and practical examples.
     </p>
   </section>
 
@@ -176,7 +199,7 @@ HEAD /badge/:label/:message
         <div class="reference-style-grid">
           {#each styles as style}
             <article>
-              <img src={`/badge.svg?label=style&message=${style[0]}&style=${style[0]}`} alt={`${style[0]} badge example`} />
+              <img src={styleSampleURL(style)} alt={`${style[0]} badge example`} />
               <h3><code>{style[0]}</code></h3>
               <p>{style[1]}</p>
             </article>
