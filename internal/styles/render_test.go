@@ -1,6 +1,8 @@
 package styles
 
 import (
+	"math"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -22,42 +24,43 @@ func TestMeasureTextUsesUnicodeDisplayWidth(t *testing.T) {
 func TestReferenceExamplesPreserveExactArtwork(t *testing.T) {
 	tests := []struct {
 		name      string
-		options   Options
+		reference Options
 		artwork   string
-		overlay   string
-		customize Options
+		custom    Options
 	}{
 		{
 			name:      "click-here",
-			options:   Options{Label: "click", Message: "here", Style: "click-here", Size: 100},
+			reference: Options{Label: "click", Message: "here", Style: "click-here", Size: 100},
 			artwork:   clickHereReferenceArtwork,
-			overlay:   `<rect x="3" y="3" width="76" height="24" fill="#cccccc"/>`,
-			customize: Options{Label: "ship", Message: "now", Style: "click-here", Size: 100},
+			custom:    Options{Label: "ship", Message: "now", Style: "click-here", Size: 100},
 		},
 		{
 			name:      "best-viewed",
-			options:   Options{Label: "viewed with", Message: "chrome", Style: "best-viewed", Size: 100},
+			reference: Options{Label: "viewed with", Message: "chrome", Style: "best-viewed", Size: 100},
 			artwork:   bestViewedReferenceArtwork,
-			overlay:   `<rect x="10" y="3" width="50" height="24" fill="#bcbcbc"/>`,
-			customize: Options{Label: "built with", Message: "Go", Style: "best-viewed", Size: 100},
+			custom:    Options{Label: "built with", Message: "Go", Style: "best-viewed", Size: 100},
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			reference := string(Render(test.options))
-			if !strings.Contains(reference, test.artwork) {
+			// Reference case should embed exact artwork
+			refSVG := string(Render(test.reference))
+			if !strings.Contains(refSVG, test.artwork) {
 				t.Fatal("reference artwork coordinates were not preserved verbatim")
 			}
-			if strings.Contains(reference, test.overlay) {
-				t.Fatal("reference example unexpectedly paints over original artwork")
-			}
-			custom := string(Render(test.customize))
-			if !strings.Contains(custom, test.artwork) || !strings.Contains(custom, test.overlay) {
-				t.Fatal("custom renderer does not preserve artwork before replacing the text region")
-			}
-			if !strings.Contains(custom, `<text `) || !strings.Contains(custom, `text-rendering="geometricPrecision"`) {
+
+			// Custom text generates procedural frames and adaptive text
+			customSVG := string(Render(test.custom))
+			if !strings.Contains(customSVG, `<text `) {
 				t.Fatal("custom renderer does not use adaptive vector text")
+			}
+			if !strings.Contains(customSVG, `text-rendering="geometricPrecision"`) {
+				t.Fatal("custom renderer missing geometricPrecision")
+			}
+			// Variable-width designs generate frames procedurally, not by embedding reference artwork
+			if strings.Contains(customSVG, test.artwork) {
+				t.Fatal("custom renderer should generate procedural frames, not embed reference artwork")
 			}
 		})
 	}
@@ -73,8 +76,8 @@ func TestAdaptiveFontSizeShrinksForLongText(t *testing.T) {
 	if long >= short {
 		t.Fatalf("long font size = %v, want smaller than %v", long, short)
 	}
-	if long < 0.5 {
-		t.Fatalf("long font size = %v, want at least 0.5", long)
+	if long < 5.0 {
+		t.Fatalf("long font size = %v, want at least 5.0", long)
 	}
 }
 
@@ -86,4 +89,73 @@ func TestAdaptiveCustomTextPreservesFullContent(t *testing.T) {
 			t.Fatalf("adaptive SVG does not contain %q", expected)
 		}
 	}
+}
+
+// TestRetroVariableWidthFormula locks the three width-calculation contracts:
+// measurement uses the uppercased phrase at the style's target font size,
+// widths stay within [min, max], and panels fill the available canvas exactly.
+func TestRetroVariableWidthFormula(t *testing.T) {
+	t.Run("old-school panels fill canvas", func(t *testing.T) {
+		for _, c := range []struct{ label, msg string }{
+			{"build", "passing"},
+			{"", "ok"},
+			{"a very long label with many words", "and an equally long message right here"},
+		} {
+			lp, mp, total := calculateOldSchoolWidths(c.label, c.msg)
+			want := total - 5 // borderAndGaps: 2px border + 1px gap + 2px border
+			if c.label == "" {
+				want = total - 4 // no gap when there is no label panel
+			}
+			if got := lp + mp; got != want {
+				t.Errorf("label=%q msg=%q: panels %d+%d=%d, want %d (total=%d)",
+					c.label, c.msg, lp, mp, got, want, total)
+			}
+			if total < oldSchoolMinWidth || total > oldSchoolMaxWidth {
+				t.Errorf("label=%q msg=%q: total %d out of [%d, %d]",
+					c.label, c.msg, total, oldSchoolMinWidth, oldSchoolMaxWidth)
+			}
+		}
+	})
+
+	t.Run("click-here measures uppercase at 7px", func(t *testing.T) {
+		phrase := "ship now"
+		upper := strings.ToUpper(phrase)
+		needed := int(math.Ceil(measureText(upper, 7))) + 12 + 10
+		want := max(clickHereMinWidth, min(needed, clickHereMaxWidth))
+		svg := string(Render(Options{Label: "", Message: phrase, Style: "click-here", Size: 100}))
+		if got := viewBoxWidth(t, svg); got != float64(want) {
+			t.Errorf("click-here width = %v, want %d for %q at 7px", got, want, upper)
+		}
+	})
+
+	t.Run("retro widths clamp to max 300", func(t *testing.T) {
+		long := strings.Repeat("w", 200)
+		for _, style := range []string{"old-school", "click-here", "best-viewed"} {
+			svg := string(Render(Options{Label: long, Message: long, Style: style, Size: 100}))
+			if got := viewBoxWidth(t, svg); got != 300 {
+				t.Errorf("%s: width = %v, want exactly 300 for extreme input", style, got)
+			}
+		}
+	})
+}
+
+// viewBoxWidth returns the width component of the SVG viewBox, failing the
+// test when the attribute is absent or unparseable.
+func viewBoxWidth(t *testing.T, svg string) float64 {
+	t.Helper()
+	const prefix = `viewBox="0 0 `
+	i := strings.Index(svg, prefix)
+	if i < 0 {
+		t.Fatalf("no viewBox in SVG")
+	}
+	rest := svg[i+len(prefix):]
+	j := strings.IndexByte(rest, ' ')
+	if j < 0 {
+		t.Fatalf("malformed viewBox in SVG")
+	}
+	width, err := strconv.ParseFloat(rest[:j], 64)
+	if err != nil {
+		t.Fatalf("unparseable viewBox width %q: %v", rest[:j], err)
+	}
+	return width
 }

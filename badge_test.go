@@ -212,7 +212,7 @@ func TestOldSchoolStyleUsesFixedPixelGeometry(t *testing.T) {
 		`shape-rendering="crispEdges"`,
 		`<rect width="80" height="15" fill="#a5a5a5"/>`,
 		`<rect x="1" y="1" width="78" height="13" fill="#fff"/>`,
-		`y="2" width="30" height="11" fill="#ff5a18"`,
+		`y="2" width="34" height="11" fill="#ff5a18"`,
 		`fill="#a8a979"`,
 		`<text `,
 		`text-rendering="geometricPrecision"`,

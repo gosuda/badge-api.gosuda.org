@@ -14,6 +14,11 @@ type adaptiveTextBox struct {
 	MaxFontSize float64
 }
 
+// minReadableFontSize is the smallest size at which Verdana glyphs stay
+// recognizable. Badge width grows with the text so this floor is reached only
+// by input past the style's maximum width.
+const minReadableFontSize = 5.0
+
 func adaptiveFontSize(text string, box adaptiveTextBox) float64 {
 	if text == "" || box.Width <= 0 || box.Height <= 0 || box.MaxFontSize <= 0 {
 		return 0
@@ -24,7 +29,7 @@ func adaptiveFontSize(text string, box adaptiveTextBox) float64 {
 	}
 	fontSize := math.Min(box.MaxFontSize, box.Height*0.82)
 	fontSize = math.Min(fontSize, box.Width/widthAtOnePixel)
-	return math.Max(fontSize, 0.5)
+	return math.Max(fontSize, minReadableFontSize)
 }
 
 func writeAdaptiveText(builder *strings.Builder, text string, box adaptiveTextBox, color string, uppercase bool, bold bool) {
