@@ -1,4 +1,5 @@
 <script>
+  import Seo from '$lib/Seo.svelte';
   import CopyTextButton from '$lib/CopyTextButton.svelte';
   import SiteFooter from '$lib/SiteFooter.svelte';
   import SiteNav from '$lib/SiteNav.svelte';
@@ -51,21 +52,66 @@ ETag: "<content hash>"`;
     ['responses', 'Responses'],
     ['errors', 'Errors']
   ];
+
+  const seoDescription = 'Read the Tiny Badge SVG API reference for endpoints, parameters, eight styles, colors, 50–300% sizing, Unicode text width, ETags, immutable caching, examples, and errors.';
+  const referenceStructuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'TechArticle',
+        '@id': 'https://badge-api.gosuda.org/reference/#article',
+        headline: 'Tiny Badge SVG Badge API Reference',
+        description: seoDescription,
+        url: 'https://badge-api.gosuda.org/reference/',
+        mainEntityOfPage: 'https://badge-api.gosuda.org/reference/',
+        dateModified: '2026-08-10',
+        inLanguage: 'en',
+        author: { '@id': 'https://badge-api.gosuda.org/#organization' },
+        publisher: { '@id': 'https://badge-api.gosuda.org/#organization' },
+        image: 'https://badge-api.gosuda.org/og-image.png',
+        about: [
+          { '@type': 'Thing', name: 'SVG badge generation' },
+          { '@type': 'Thing', name: 'HTTP API' },
+          { '@type': 'Thing', name: 'Immutable caching and ETags' }
+        ]
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Tiny Badge',
+            item: 'https://badge-api.gosuda.org/'
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'API Reference',
+            item: 'https://badge-api.gosuda.org/reference/'
+          }
+        ]
+      }
+    ]
+  };
 </script>
 
-<svelte:head>
-  <title>API Reference — Tiny Badge</title>
-  <meta name="description" content="Detailed Tiny Badge API endpoints, parameters, styles, colors, examples, caching, and errors." />
-  <link rel="icon" href="/favicon.svg" />
-</svelte:head>
+<Seo
+  title="SVG Badge API Reference — Tiny Badge"
+  description={seoDescription}
+  path="/reference/"
+  type="article"
+  modifiedTime="2026-08-10T00:00:00Z"
+  structuredData={referenceStructuredData}
+/>
 
 <SiteNav active="reference" bind:dismissed={bannerDismissed} />
 
 <main id="top" class:banner-dismissed={bannerDismissed} class="reference-page">
   <section class="reference-hero section-shell">
-    <h1>Everything the badge link understands.</h1>
+    <h1>Everything the SVG badge API understands.</h1>
     <p>
-      Two endpoint shapes, eight looks, four color controls, and an exact size dial from 50% to 300%.
+      Query and path endpoints, eight rendering styles, exact 50–300% sizing, four color controls, Unicode-aware text width, immutable cache headers, ETags, and practical examples.
     </p>
   </section>
 
@@ -82,7 +128,7 @@ ETag: "<content hash>"`;
       <section id="overview" class="reference-section">
         <h2>Overview</h2>
         <p>
-          Tiny Badge returns an SVG image from the words, style, and colors encoded in the request URL. The same URL always describes the same badge, which makes it suitable for profiles, project pages, Markdown, and ordinary image tags.
+          Tiny Badge returns a deterministic SVG image from the label, message, style, size, and colors encoded in the request URL. Unicode graphemes are measured with <code>go-runewidth</code>, successful responses use long-lived immutable caching and content-derived ETags, and the same URL always describes the same badge.
         </p>
         <div class="reference-callout">
           <strong>Placeholder origin</strong>

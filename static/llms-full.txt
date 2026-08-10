@@ -1,0 +1,73 @@
+# Tiny Badge: detailed context
+
+Tiny Badge is a free SVG badge generator and HTTP API hosted at https://badge-api.gosuda.org/. It is intended for project pages, README files, Markdown documents, profiles, newsletters, dashboards, and any page that can display an image URL.
+
+## Core behavior
+
+- Query endpoint: `GET` or `HEAD /badge.svg`.
+- Path endpoint: `GET` or `HEAD /badge/:label/:message`.
+- Health endpoint: `GET /healthz` returns `ok`.
+- A message is required. Label text is optional.
+- The query endpoint preserves a literal `.svg` suffix in the message.
+- The path endpoint removes a final `.svg` suffix from the message.
+- Use `_` as the path label for a badge without a label segment.
+
+## Query parameters
+
+- `message`: required main text, maximum 128 Unicode code points.
+- `label`: optional left text, maximum 64 Unicode code points.
+- `style`: one of `flat`, `flat-square`, `plastic`, `round`, `outline`, `neon`, `glass`, or `flatbar`; default `flat`.
+- `size`: integer scale percentage from 50 through 300; default 100.
+- `labelColor`: label background; default `555555`.
+- `color`: message background; default `44cc11`.
+- `labelTextColor`: label text; default `ffffff`.
+- `textColor`: message text; default `ffffff`.
+
+The API accepts 3-digit or 6-digit hexadecimal colors without a leading `#`, plus documented named colors. The visual maker also accepts separate Hex, RGB, HSL, and OKLCH channels. Every maker color is converted to canonical integer RGB and serialized as hexadecimal in the final URL.
+
+## Rendering
+
+- Text width uses `github.com/mattn/go-runewidth` with grapheme-aware handling for combining marks, CJK characters, and emoji sequences.
+- The SVG uses `lengthAdjust="spacing"` to avoid stretching glyph shapes.
+- `size` scales the SVG `width` and `height`; the internal `viewBox` and style proportions remain stable.
+- The maker offers a debounced live preview, exact size input, and switchable 1× or 2× inspection zoom.
+
+## HTTP and caching
+
+Successful badge responses include:
+
+- `Content-Type: image/svg+xml; charset=utf-8`
+- `Cache-Control: public, max-age=315360000, immutable`
+- `CDN-Cache-Control: public, max-age=315360000, immutable`
+- `Surrogate-Control: public, max-age=315360000, immutable`
+- `Access-Control-Allow-Origin: *`
+- A content-derived `ETag`
+
+An unchanged badge request with a matching `If-None-Match` header returns `304 Not Modified`. Invalid input returns `400 Bad Request` with `Cache-Control: no-store`.
+
+## Examples
+
+Query URL:
+
+`https://badge-api.gosuda.org/badge.svg?label=build&message=passing&style=flatbar&size=125`
+
+Path URL:
+
+`https://badge-api.gosuda.org/badge/release/stable.svg`
+
+Markdown:
+
+`![Build status](https://badge-api.gosuda.org/badge.svg?label=build&message=passing)`
+
+## Implementation and deployment
+
+- Backend: Go `net/http` with `github.com/julienschmidt/httprouter`.
+- Frontend: SvelteKit static output embedded in the Go executable.
+- Long-running modes: TCP or Unix socket listener with graceful shutdown.
+- Shared-hosting mode: Node.js public proxy forwarding to a private Unix socket.
+- Apache mode: CGI selected through the standard `GATEWAY_INTERFACE` environment variable; all routes, frontend files, API responses, and health checks are served by the embedded executable.
+- Production Linux AMD64 CGI builds use `CGO_ENABLED=0`, `-trimpath`, and `-ldflags='-s -w'`.
+
+## Pricing
+
+Solo, Team, Studio, and Enterprise all display a price of $0. Team and Enterprise are described per seat, and every additional seat also costs $0. Annual billing advertises 40% off while the total remains $0.

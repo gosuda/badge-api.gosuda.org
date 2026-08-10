@@ -1,4 +1,5 @@
 <script>
+  import Seo from '$lib/Seo.svelte';
   import SiteFooter from '$lib/SiteFooter.svelte';
   import SiteNav from '$lib/SiteNav.svelte';
 
@@ -44,22 +45,69 @@
   ];
 
   const sharedBenefits = ['Unlimited badges', 'Every look and color tool', 'Links that are ready to travel'];
+
+  const seoDescription = 'Compare four free Tiny Badge plans. Solo, Team, Studio, and Enterprise are all $0, with unlimited SVG badges, eight styles, exact sizing, and every color control.';
+  const pricingStructuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': 'https://badge-api.gosuda.org/pricing/#webpage',
+        url: 'https://badge-api.gosuda.org/pricing/',
+        name: 'Free SVG Badge Pricing — Tiny Badge',
+        description: seoDescription,
+        isPartOf: { '@id': 'https://badge-api.gosuda.org/#website' },
+        about: { '@id': 'https://badge-api.gosuda.org/#application' },
+        inLanguage: 'en'
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Tiny Badge',
+            item: 'https://badge-api.gosuda.org/'
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Pricing',
+            item: 'https://badge-api.gosuda.org/pricing/'
+          }
+        ]
+      },
+      {
+        '@type': 'OfferCatalog',
+        name: 'Tiny Badge plans',
+        itemListElement: plans.map((plan) => ({
+          '@type': 'Offer',
+          name: `${plan.name} plan`,
+          description: plan.description,
+          price: '0',
+          priceCurrency: 'USD',
+          offeredBy: { '@id': 'https://badge-api.gosuda.org/#organization' }
+        }))
+      }
+    ]
+  };
 </script>
 
-<svelte:head>
-  <title>Pricing — Tiny Badge</title>
-  <meta name="description" content="Four Tiny Badge plans. Every one costs exactly zero dollars." />
-  <link rel="icon" href="/favicon.svg" />
-</svelte:head>
+<Seo
+  title="Free SVG Badge Pricing — Tiny Badge"
+  description={seoDescription}
+  path="/pricing/"
+  structuredData={pricingStructuredData}
+/>
 
 <SiteNav active="pricing" bind:dismissed={bannerDismissed} />
 
 <main id="top" class:banner-dismissed={bannerDismissed} class="pricing-page">
   <section class="pricing-hero section-shell">
     <div>
-      <h1>Four plans.<br />One suspiciously identical price.</h1>
+      <h1>Four free SVG badge plans.<br />One suspiciously identical price.</h1>
       <p>
-        Choose by team size, personal mythology, or whichever card looks nicest next to your current browser tab.
+        Every plan includes unlimited SVG badge URLs, all eight styles, exact size controls, Unicode-aware text, and the complete Hex, RGB, HSL, and OKLCH color editor.
       </p>
     </div>
     <div class="billing-box">

@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import ColorEditor from '$lib/ColorEditor.svelte';
   import { rgbToHex } from '$lib/color.js';
+  import Seo from '$lib/Seo.svelte';
   import SiteFooter from '$lib/SiteFooter.svelte';
   import SiteNav from '$lib/SiteNav.svelte';
   import StylePicker from '$lib/StylePicker.svelte';
@@ -23,6 +24,68 @@
     color: { r: 214, g: 239, b: 83 },
     labelTextColor: { r: 255, g: 255, b: 255 },
     textColor: { r: 41, g: 39, b: 36 }
+  };
+
+  const seoDescription = 'Create customizable SVG badges with eight styles, exact 50–300% sizing, RGB, HSL, and OKLCH color controls, Unicode-aware text width, immutable caching, and shareable URLs.';
+  const homeStructuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': 'https://badge-api.gosuda.org/#organization',
+        name: 'Tiny Badge',
+        url: 'https://badge-api.gosuda.org/',
+        logo: 'https://badge-api.gosuda.org/favicon.svg'
+      },
+      {
+        '@type': 'WebSite',
+        '@id': 'https://badge-api.gosuda.org/#website',
+        url: 'https://badge-api.gosuda.org/',
+        name: 'Tiny Badge',
+        description: seoDescription,
+        inLanguage: 'en',
+        publisher: { '@id': 'https://badge-api.gosuda.org/#organization' }
+      },
+      {
+        '@type': 'WebApplication',
+        '@id': 'https://badge-api.gosuda.org/#application',
+        name: 'Tiny Badge',
+        url: 'https://badge-api.gosuda.org/',
+        description: seoDescription,
+        applicationCategory: 'DeveloperApplication',
+        operatingSystem: 'Any',
+        browserRequirements: 'A modern web browser with JavaScript for the visual maker; generated SVG URLs work as ordinary images.',
+        offers: {
+          '@type': 'Offer',
+          price: '0',
+          priceCurrency: 'USD'
+        },
+        featureList: [
+          'Eight SVG badge styles',
+          'Exact size scaling from 50 to 300 percent',
+          'Hex, RGB, HSL, and OKLCH color controls',
+          'Unicode-aware text measurement',
+          'Immutable badge URLs with ETags'
+        ],
+        publisher: { '@id': 'https://badge-api.gosuda.org/#organization' }
+      },
+      {
+        '@type': 'WebPage',
+        '@id': 'https://badge-api.gosuda.org/#webpage',
+        url: 'https://badge-api.gosuda.org/',
+        name: 'SVG Badge Generator & API — Tiny Badge',
+        description: seoDescription,
+        isPartOf: { '@id': 'https://badge-api.gosuda.org/#website' },
+        about: { '@id': 'https://badge-api.gosuda.org/#application' },
+        primaryImageOfPage: {
+          '@type': 'ImageObject',
+          url: 'https://badge-api.gosuda.org/og-image.png',
+          width: 1200,
+          height: 630
+        },
+        inLanguage: 'en'
+      }
+    ]
   };
 
   let label = $state('tiny');
@@ -134,23 +197,21 @@
   }
 </script>
 
-<svelte:head>
-  <title>Tiny Badge — Small signs, good manners</title>
-  <meta
-    name="description"
-    content="Make a small, colorful badge and send it off into the world."
-  />
-  <link rel="icon" href="/favicon.svg" />
-</svelte:head>
+<Seo
+  title="SVG Badge Generator & API — Tiny Badge"
+  description={seoDescription}
+  path="/"
+  structuredData={homeStructuredData}
+/>
 
 <SiteNav active="maker" bind:dismissed={bannerDismissed} />
 
 <main id="top" class:banner-dismissed={bannerDismissed}>
   <section class="hero section-shell">
     <div class="hero__copy">
-      <h1>A tiny badge<br />with a lot to say.</h1>
+      <h1>A tiny SVG badge<br />with a lot to say.</h1>
       <p>
-        Pick the words, fuss over the colors, and leave with a little link that is ready to wander.
+        Create a crisp SVG badge from a label, message, style, exact size, and color recipe—then copy one immutable URL for Markdown, project pages, profiles, or docs.
       </p>
       <div class="hero__actions">
         <a class="btn btn--push" href="#designer">Make a badge</a>
@@ -176,8 +237,8 @@
   <section id="designer" class="designer-band">
     <div class="section-shell designer-heading">
       <div>
-        <h2>Make it yours</h2>
-        <p>Tweak a word. Nudge a color. Find the size that fits. Change your mind twice.</p>
+        <h2>Make your SVG badge</h2>
+        <p>Tweak the words, choose one of eight styles, set an exact size, and tune every color channel.</p>
       </div>
       <code>No wrong turns</code>
     </div>
@@ -326,9 +387,9 @@
 
   <section id="ideas" class="api-section section-shell">
     <div class="api-section__copy">
-      <h2>Small badge. Plenty of places to go.</h2>
+      <h2>Small SVG badge. Plenty of places to go.</h2>
       <p>
-        Tuck it into the corners that could use a little clarity, color, or cheerful showing off.
+        Tiny Badge is a free SVG badge generator and HTTP API for project pages, profiles, Markdown, documentation, newsletters, and anywhere an image URL can travel.
       </p>
     </div>
     <div class="api-reference">

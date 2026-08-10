@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://badge-api.gosuda.org/</loc>
+    <lastmod>2026-08-10</lastmod>
+    <image:image>
+      <image:loc>https://badge-api.gosuda.org/og-image.png</image:loc>
+      <image:title>Tiny Badge SVG badge generator and API</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://badge-api.gosuda.org/pricing/</loc>
+    <lastmod>2026-08-10</lastmod>
+  </url>
+  <url>
+    <loc>https://badge-api.gosuda.org/reference/</loc>
+    <lastmod>2026-08-10</lastmod>
+  </url>
+</urlset>

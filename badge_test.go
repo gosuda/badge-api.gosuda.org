@@ -25,6 +25,9 @@ func TestBadgeHandlerCachesImmutableSVG(t *testing.T) {
 	if got := response.Header().Get("Content-Type"); got != "image/svg+xml; charset=utf-8" {
 		t.Fatalf("Content-Type = %q", got)
 	}
+	if got := response.Header().Get("X-Robots-Tag"); got != "noindex, noarchive" {
+		t.Fatalf("X-Robots-Tag = %q", got)
+	}
 	etag := response.Header().Get("ETag")
 	if etag == "" {
 		t.Fatal("ETag is empty")
@@ -45,6 +48,18 @@ func TestBadgeHandlerCachesImmutableSVG(t *testing.T) {
 	}
 	if conditionalResponse.Body.Len() != 0 {
 		t.Fatalf("conditional body length = %d, want 0", conditionalResponse.Body.Len())
+	}
+}
+
+func TestHealthzIsNotIndexable(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "/healthz", nil)
+	response := httptest.NewRecorder()
+	newHandler().ServeHTTP(response, request)
+	if response.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", response.Code, http.StatusOK)
+	}
+	if got := response.Header().Get("X-Robots-Tag"); got != "noindex, noarchive" {
+		t.Fatalf("X-Robots-Tag = %q", got)
 	}
 }
 

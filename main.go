@@ -104,6 +104,7 @@ func newHandler() http.Handler {
 	router.GET("/healthz", func(response http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 		response.Header().Set("Cache-Control", "no-store")
 		response.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		response.Header().Set("X-Robots-Tag", "noindex, noarchive")
 		response.WriteHeader(http.StatusOK)
 		_, _ = response.Write([]byte("ok\n"))
 	})
@@ -194,6 +195,7 @@ func setBadgeHeaders(header http.Header, etag string) {
 	header.Set("Content-Security-Policy", "default-src 'none'; style-src 'unsafe-inline'; sandbox")
 	header.Set("Access-Control-Allow-Origin", "*")
 	header.Set("X-Content-Type-Options", "nosniff")
+	header.Set("X-Robots-Tag", "noindex, noarchive")
 	header.Set("ETag", etag)
 }
 
@@ -201,7 +203,7 @@ func frontendHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
 		path := request.URL.Path
 		switch {
-		case path == "/" || strings.HasSuffix(path, ".html"):
+		case path == "/" || strings.HasSuffix(path, "/") || strings.HasSuffix(path, ".html"):
 			response.Header().Set("Cache-Control", "no-cache")
 		case strings.HasPrefix(path, "/_app/immutable/"):
 			response.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
