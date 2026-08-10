@@ -16,11 +16,11 @@
     const query = new URLSearchParams({
       label: 'mood',
       message: style.sample,
-      style,
+      style: style.id,
       labelColor: '292724',
-      color: style === 'flatbar' ? '7c5cff' : 'd6ef53',
+      color: style.id === 'flatbar' ? '7c5cff' : 'd6ef53',
       labelTextColor: 'ffffff',
-      textColor: style === 'flatbar' ? 'ffffff' : '292724'
+      textColor: style.id === 'flatbar' ? 'ffffff' : '292724'
     });
     return `/badge.svg?${query}`;
   }
