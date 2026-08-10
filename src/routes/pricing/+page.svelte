@@ -13,7 +13,7 @@
       description: 'For one person with one excellent idea and at least three favorite colors.',
       perSeat: false,
       tone: 'pear',
-      cta: 'Choose Solo',
+      cta: 'Choose solo',
       extras: ['Extra independent vibe', 'Extra “I made this” vibe']
     },
     {
@@ -30,7 +30,7 @@
       description: 'For a room full of taste, tabs, and someone asking whether the green feels greener.',
       perSeat: false,
       tone: 'lavender',
-      cta: 'Go Studio',
+      cta: 'Go studio',
       extras: ['Extra polished vibe', 'Extra good-chair vibe', 'Extra one-more-version vibe', 'Extra tasteful-nod vibe']
     },
     {
@@ -39,7 +39,7 @@
       perSeat: true,
       tone: 'ink',
       enterprise: true,
-      cta: 'Choose Enterprise',
+      cta: 'Choose enterprise',
       extras: ['Extra enterprise vibe', 'Extra procurement vibe', 'Extra lanyard vibe', 'Extra quarterly vibe', 'Extra approved-font vibe']
     }
   ];
