@@ -1,46 +1,50 @@
 <script>
-  import { colorModes, formatColor, parseColor } from './color.js';
-
-  const colorModeLabels = {
-    hex: 'Quick',
-    rgb: 'Light mix',
-    hsl: 'Hue mix',
-    oklch: 'Even light'
-  };
+  import {
+    colorModes,
+    hexToRgb,
+    rgbFromColorMode,
+    rgbToHex,
+    valuesForColorMode
+  } from './color.js';
 
   let {
     label,
     value,
-    help = 'Pick the one that feels right.',
+    help = 'Every recipe is converted to RGB before the badge link is made.',
     oncolorchange = () => {}
   } = $props();
 
   let mode = $state('hex');
-  let text = $state('');
+  let channels = $state({});
+  let activeField = $state(null);
   let touched = $state(false);
-  let focused = $state(false);
   let invalid = $state(false);
 
+  const editorId = $derived(label.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
+  const selectedMode = $derived(colorModes.find((candidate) => candidate.id === mode) ?? colorModes[0]);
+
   $effect(() => {
-    if (!focused) text = formatColor(value, mode);
+    if (activeField === null) channels = valuesForColorMode(value, mode);
   });
 
   function selectMode(event) {
     mode = event.currentTarget.value;
-    text = formatColor(value, mode);
+    channels = valuesForColorMode(value, mode);
+    activeField = null;
     invalid = false;
   }
 
   function chooseNative(event) {
-    const next = event.currentTarget.value;
+    const next = hexToRgb(event.currentTarget.value);
+    if (!next) return;
     oncolorchange(next);
-    text = formatColor(next, mode);
+    channels = valuesForColorMode(next, mode);
     invalid = false;
   }
 
-  function editValue(event) {
-    text = event.currentTarget.value;
-    const next = parseColor(text, mode);
+  function editChannel(channel, event) {
+    channels = { ...channels, [channel.key]: event.currentTarget.value };
+    const next = rgbFromColorMode(channels, mode);
     if (next) {
       oncolorchange(next);
       invalid = false;
@@ -49,23 +53,23 @@
     }
   }
 
-  function blurValue() {
-    focused = false;
+  function blurChannel() {
+    activeField = null;
     touched = true;
-    const next = parseColor(text, mode);
+    const next = rgbFromColorMode(channels, mode);
     invalid = !next;
     if (!next) return;
     oncolorchange(next);
-    text = formatColor(next, mode);
+    channels = valuesForColorMode(next, mode);
   }
 </script>
 
 <div class:error={invalid} class="color-editor">
   <div class="color-editor__head">
-    <label class="field-label" for={`${label}-value`}>{label}</label>
-    <select class="space-select" aria-label={`${label} recipe`} value={mode} onchange={selectMode}>
+    <span class="field-label">{label}</span>
+    <select class="space-select" aria-label={`${label} color model`} value={mode} onchange={selectMode}>
       {#each colorModes as colorMode}
-        <option value={colorMode}>{colorModeLabels[colorMode]}</option>
+        <option value={colorMode.id}>{colorMode.label}</option>
       {/each}
     </select>
   </div>
@@ -73,25 +77,46 @@
     <input
       class="native-color"
       type="color"
-      value={value}
+      value={rgbToHex(value)}
       aria-label={`Open the ${label} swatch`}
       oninput={chooseNative}
     />
-    <input
-      id={`${label}-value`}
-      class="text-input color-editor__value"
-      type="text"
-      value={text}
-      aria-invalid={invalid}
-      aria-describedby={`${label}-help`}
-      onfocus={() => (focused = true)}
-      oninput={editValue}
-      onblur={blurValue}
-      spellcheck="false"
-      autocomplete="off"
-    />
+    <div
+      class:single={selectedMode.channels.length === 1}
+      class="color-channel-grid"
+      role="group"
+      aria-label={`${label} ${selectedMode.label} channels`}
+    >
+      {#each selectedMode.channels as channel}
+        <label class="color-channel" for={`${editorId}-${mode}-${channel.key}`}>
+          <span>{channel.label}</span>
+          <span class="color-channel__control">
+            {#if channel.prefix}<span aria-hidden="true">{channel.prefix}</span>{/if}
+            <input
+              id={`${editorId}-${mode}-${channel.key}`}
+              class="color-channel__input"
+              type={channel.type}
+              inputmode={channel.inputmode}
+              min={channel.min}
+              max={channel.max}
+              step={channel.step}
+              maxlength={channel.maxlength}
+              value={channels[channel.key] ?? ''}
+              aria-invalid={invalid}
+              aria-describedby={`${editorId}-help`}
+              onfocus={() => (activeField = channel.key)}
+              oninput={(event) => editChannel(channel, event)}
+              onblur={blurChannel}
+              spellcheck="false"
+              autocomplete="off"
+            />
+            {#if channel.suffix}<span aria-hidden="true">{channel.suffix}</span>{/if}
+          </span>
+        </label>
+      {/each}
+    </div>
   </div>
-  <p id={`${label}-help`} class="field-help" class:error-text={invalid}>
-    {invalid ? 'We couldn’t read that color. Try the swatch or check the numbers.' : help}
+  <p id={`${editorId}-help`} class="field-help" class:error-text={invalid}>
+    {invalid ? 'That channel is outside its usable range.' : help}
   </p>
 </div>

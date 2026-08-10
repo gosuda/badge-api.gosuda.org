@@ -11,6 +11,7 @@
     "build:cgi:linux-amd64": "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 npm run build:cgi",
     "build": "npm run build:web && npm run build:server",
     "start": "node run.js",
+    "test:color": "node --test src/lib/color.test.js",
     "check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json"
   },
   "devDependencies": {

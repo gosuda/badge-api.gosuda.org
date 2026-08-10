@@ -60,6 +60,7 @@ The path endpoint removes a final `.svg` suffix from the message. The query endp
 | `message` | Yes | — | Main badge text. Maximum 128 characters. |
 | `label` | No | Empty | Left-side badge text. Maximum 64 characters. |
 | `style` | No | `flat` | Badge rendering style. |
+| `size` | No | `100` | Whole-badge scale percentage. Integer from `50` through `300`. |
 | `labelColor` | No | `555555` | Label background color. |
 | `color` | No | `44cc11` | Message background color. |
 | `labelTextColor` | No | `ffffff` | Label text color. |
@@ -70,6 +71,14 @@ Spaces and punctuation must be URL encoded. For example:
 ```text
 https://badge.example.com/badge.svg?label=release&message=ready%20to%20ship
 ```
+
+Scale a badge to an exact percentage:
+
+```text
+https://badge.example.com/badge.svg?label=release&message=ready&size=150
+```
+
+The SVG keeps each style's original proportions. The `width` and `height` attributes scale while the internal `viewBox` remains stable.
 
 ## Styles
 
@@ -92,7 +101,7 @@ https://badge.example.com/badge.svg?label=mood&message=loud&style=flatbar
 
 ## Colors
 
-Colors accept 3-digit or 6-digit hexadecimal values. Omit the leading `#`:
+The API accepts 3-digit or 6-digit hexadecimal values. Omit the leading `#`:
 
 ```text
 color=d6ef53
@@ -100,6 +109,8 @@ labelColor=292724
 ```
 
 If a leading `#` is included, encode it as `%23` because an unescaped `#` starts a URL fragment.
+
+The visual maker offers separate RGB, HSL, and OKLCH channel inputs. Those values are converted to RGB internally and serialized as hexadecimal values in the badge URL.
 
 Named colors are also supported:
 
@@ -183,6 +194,8 @@ Examples of invalid input:
 /badge.svg?message=
 /badge.svg?message=ready&style=unknown
 /badge.svg?message=ready&color=not-a-color
+/badge.svg?message=ready&size=49
+/badge.svg?message=ready&size=large
 ```
 
 The health endpoint is available at:

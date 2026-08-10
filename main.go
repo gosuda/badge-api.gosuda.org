@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -159,6 +160,17 @@ func badgeOptionsFromRequest(request *http.Request, params httprouter.Params) (b
 	if label == "_" {
 		label = ""
 	}
+	size := defaultBadgeSize
+	if query.Has("size") {
+		parsed, err := strconv.Atoi(strings.TrimSpace(query.Get("size")))
+		if err != nil {
+			return badgeOptions{}, fmt.Errorf("size must be an integer percentage")
+		}
+		if parsed < minBadgeSize || parsed > maxBadgeSize {
+			return badgeOptions{}, fmt.Errorf("size must be between %d and %d percent", minBadgeSize, maxBadgeSize)
+		}
+		size = parsed
+	}
 
 	return validateBadgeOptions(badgeOptions{
 		Label:            label,
@@ -168,6 +180,7 @@ func badgeOptionsFromRequest(request *http.Request, params httprouter.Params) (b
 		MessageColor:     query.Get("color"),
 		LabelTextColor:   query.Get("labelTextColor"),
 		MessageTextColor: query.Get("textColor"),
+		Size:             size,
 	})
 }
 

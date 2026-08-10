@@ -65,8 +65,7 @@
     <div class="billing-box">
       <div class="billing-switch" role="group" aria-label="Billing period">
         <button class:active={billing === 'monthly'} type="button" aria-pressed={billing === 'monthly'} onclick={() => (billing = 'monthly')}>Monthly</button>
-        <button class:active={billing === 'annual'} type="button" aria-pressed={billing === 'annual'} onclick={() => (billing = 'annual')}>Annual</button>
-        <span>Save 40%</span>
+        <button class:active={billing === 'annual'} type="button" aria-pressed={billing === 'annual'} onclick={() => (billing = 'annual')}>Annual <span class="billing-discount">40% off</span></button>
       </div>
       <p>
         {annual

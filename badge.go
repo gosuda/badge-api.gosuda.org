@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/mattn/go-runewidth"
 )
 
 type badgeOptions struct {
@@ -17,6 +19,7 @@ type badgeOptions struct {
 	MessageColor     string
 	LabelTextColor   string
 	MessageTextColor string
+	Size             int
 }
 
 type styleSpec struct {
@@ -28,6 +31,17 @@ type styleSpec struct {
 	BoldLabel   bool
 	BoldMessage bool
 	Kind        string
+}
+
+const (
+	defaultBadgeSize = 100
+	minBadgeSize     = 50
+	maxBadgeSize     = 300
+)
+
+var badgeTextWidth = &runewidth.Condition{
+	EastAsianWidth:     false,
+	StrictEmojiNeutral: false,
 }
 
 var badgeStyles = map[string]styleSpec{
@@ -97,6 +111,12 @@ func validateBadgeOptions(options badgeOptions) (badgeOptions, error) {
 	if _, ok := badgeStyles[options.Style]; !ok {
 		return badgeOptions{}, fmt.Errorf("unknown style %q; supported styles: %s", options.Style, strings.Join(availableStyles(), ", "))
 	}
+	if options.Size == 0 {
+		options.Size = defaultBadgeSize
+	}
+	if options.Size < minBadgeSize || options.Size > maxBadgeSize {
+		return badgeOptions{}, fmt.Errorf("size must be between %d and %d percent", minBadgeSize, maxBadgeSize)
+	}
 	if options.Message == "" {
 		return badgeOptions{}, fmt.Errorf("message is required")
 	}
@@ -148,12 +168,13 @@ func renderBadge(options badgeOptions) []byte {
 		aria = label + ": " + message
 	}
 
+	scale := float64(options.Size) / 100
 	var builder strings.Builder
 	builder.Grow(1400)
 	builder.WriteString(`<svg xmlns="http://www.w3.org/2000/svg" width="`)
-	builder.WriteString(number(totalWidth))
+	builder.WriteString(number(totalWidth * scale))
 	builder.WriteString(`" height="`)
-	builder.WriteString(number(spec.Height))
+	builder.WriteString(number(spec.Height * scale))
 	builder.WriteString(`" viewBox="0 0 `)
 	builder.WriteString(number(totalWidth))
 	builder.WriteByte(' ')
@@ -259,7 +280,7 @@ func writeText(builder *strings.Builder, text string, x, y, width float64, color
 	builder.WriteString(number(y))
 	builder.WriteString(`" textLength="`)
 	builder.WriteString(number(width))
-	builder.WriteString(`" lengthAdjust="spacingAndGlyphs" fill="#`)
+	builder.WriteString(`" lengthAdjust="spacing" fill="#`)
 	builder.WriteString(color)
 	builder.WriteByte('"')
 	if bold {
@@ -271,19 +292,16 @@ func writeText(builder *strings.Builder, text string, x, y, width float64, color
 }
 
 func measureText(text string, fontSize float64) float64 {
-	var width float64
+	width := float64(badgeTextWidth.StringWidth(text)) * 0.62
 	for _, char := range text {
+		if char >= utf8.RuneSelf {
+			continue
+		}
 		switch {
-		case char == ' ':
-			width += 0.34
-		case strings.ContainsRune("ilI1.,'`|!:;", char):
-			width += 0.34
+		case char == ' ', strings.ContainsRune("ilI1.,'`|!:;", char):
+			width -= 0.28
 		case strings.ContainsRune("mwMW@%&#", char):
-			width += 0.92
-		case char >= utf8.RuneSelf:
-			width += 1.0
-		default:
-			width += 0.62
+			width += 0.30
 		}
 	}
 	return math.Max(width*fontSize, fontSize*0.5)

@@ -102,6 +102,7 @@ Upload `deployment/.htaccess` and `deployment/cgi-bin/badge-api.gosuda.org.cgi` 
 
 ```sh
 npm run check
+npm run test:color
 go test ./...
 npm run build
 node --check run.js

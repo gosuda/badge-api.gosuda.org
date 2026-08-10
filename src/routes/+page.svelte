@@ -1,33 +1,58 @@
 <script>
   import { onMount } from 'svelte';
   import ColorEditor from '$lib/ColorEditor.svelte';
+  import { rgbToHex } from '$lib/color.js';
   import SiteFooter from '$lib/SiteFooter.svelte';
   import SiteNav from '$lib/SiteNav.svelte';
   import StylePicker from '$lib/StylePicker.svelte';
 
+  const minSize = 50;
+  const maxSize = 300;
+  const styleHeights = {
+    flat: 20,
+    'flat-square': 20,
+    plastic: 18,
+    round: 24,
+    outline: 22,
+    neon: 24,
+    glass: 24,
+    flatbar: 28
+  };
+
   let label = $state('tiny');
   let message = $state('but mighty');
   let style = $state('flat');
+  let size = $state(100);
+  let sizeText = $state('100');
+  let sizeInputFocused = $state(false);
   let colors = $state({
-    labelColor: '#292724',
-    color: '#d6ef53',
-    labelTextColor: '#ffffff',
-    textColor: '#292724'
+    labelColor: { r: 41, g: 39, b: 36 },
+    color: { r: 214, g: 239, b: 83 },
+    labelTextColor: { r: 255, g: 255, b: 255 },
+    textColor: { r: 41, g: 39, b: 36 }
   });
   let origin = $state('');
   let copyState = $state('idle');
   let bannerDismissed = $state(false);
   let burst = $state(false);
 
+  const previewHeight = $derived((styleHeights[style] * size) / 100);
+  const exactSizeValid = $derived(Number.isInteger(Number(sizeText)) && Number(sizeText) >= minSize && Number(sizeText) <= maxSize);
+
+  $effect(() => {
+    if (!sizeInputFocused) sizeText = String(size);
+  });
+
   const badgePath = $derived.by(() => {
     const query = new URLSearchParams({
       label,
       message,
       style,
-      labelColor: colors.labelColor.slice(1),
-      color: colors.color.slice(1),
-      labelTextColor: colors.labelTextColor.slice(1),
-      textColor: colors.textColor.slice(1)
+      size: String(size),
+      labelColor: rgbToHex(colors.labelColor).slice(1),
+      color: rgbToHex(colors.color).slice(1),
+      labelTextColor: rgbToHex(colors.labelTextColor).slice(1),
+      textColor: rgbToHex(colors.textColor).slice(1)
     });
     return `/badge.svg?${query}`;
   });
@@ -41,6 +66,25 @@
 
   function setColor(key, value) {
     colors[key] = value;
+  }
+
+  function setSizeFromRange(event) {
+    size = Number(event.currentTarget.value);
+  }
+
+  function editExactSize(event) {
+    sizeText = event.currentTarget.value;
+    const next = Number(sizeText);
+    if (Number.isInteger(next) && next >= minSize && next <= maxSize) size = next;
+  }
+
+  function blurExactSize() {
+    sizeInputFocused = false;
+    sizeText = String(size);
+  }
+
+  function formatPixels(value) {
+    return Number.isInteger(value) ? String(value) : value.toFixed(1);
   }
 
   async function copyURL() {
@@ -102,7 +146,7 @@
     <div class="section-shell designer-heading">
       <div>
         <h2>Make it yours</h2>
-        <p>Tweak a word. Nudge a color. Change your mind twice. That’s the fun part.</p>
+        <p>Tweak a word. Nudge a color. Find the size that fits. Change your mind twice.</p>
       </div>
       <code>No wrong turns</code>
     </div>
@@ -136,9 +180,53 @@
 
         <section class="control-section">
           <div class="section-title-row">
+            <h3>Size</h3>
+            <output class="size-readout" for="badge-size">{size}%</output>
+          </div>
+          <p id="size-help" class="control-intro">Slide in broad strokes, then type the exact percentage when you want to be picky.</p>
+          <div class="size-control">
+            <label class="size-slider-field" for="badge-size">
+              <span class="field-label">Badge scale</span>
+              <input
+                id="badge-size"
+                class="size-slider"
+                type="range"
+                min={minSize}
+                max={maxSize}
+                step="5"
+                value={size}
+                aria-describedby="size-help"
+                oninput={setSizeFromRange}
+              />
+              <span class="size-range"><span>{minSize}%</span><span>{maxSize}%</span></span>
+            </label>
+            <label class="size-exact-field" for="badge-size-exact">
+              <span class="field-label">Exact value</span>
+              <span class:error={!exactSizeValid} class="size-exact-control">
+                <input
+                  id="badge-size-exact"
+                  type="number"
+                  min={minSize}
+                  max={maxSize}
+                  step="1"
+                  value={sizeText}
+                  aria-invalid={!exactSizeValid}
+                  aria-describedby="size-help"
+                  onfocus={() => (sizeInputFocused = true)}
+                  oninput={editExactSize}
+                  onblur={blurExactSize}
+                />
+                <span aria-hidden="true">%</span>
+              </span>
+            </label>
+          </div>
+        </section>
+
+        <section class="control-section">
+          <div class="section-title-row">
             <h3>Colors</h3>
           </div>
-          <p class="control-intro">Use the swatch, type a favorite, or take the scenic route through the menu.</p>
+          <p class="control-intro">Pick a recipe and tune each channel separately. The maker quietly converts every result to RGB.</p>
           <div class="color-grid">
             <ColorEditor label="First bit backdrop" value={colors.labelColor} oncolorchange={(value) => setColor('labelColor', value)} />
             <ColorEditor label="Main bit backdrop" value={colors.color} oncolorchange={(value) => setColor('color', value)} />
@@ -155,16 +243,17 @@
               <span>Right this minute</span>
               <strong>Your badge</strong>
             </div>
-            <span class="status-dot">Looking good</span>
+            <span class="status-dot">Live preview</span>
           </div>
           <div class="preview-stage">
+            <span class="preview-scale-note">2× inspection view</span>
             {#key badgePath}
               <img class="badge-preview" src={badgePath} alt={`${label}: ${message}`} />
             {/key}
           </div>
           <div class="preview-meta">
-            <span>Made by you</span>
-            <span>Ready to roam</span>
+            <span>{size}% scale</span>
+            <span>{formatPixels(previewHeight)} px tall</span>
           </div>
         </div>
 

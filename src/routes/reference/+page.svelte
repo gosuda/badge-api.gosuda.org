@@ -5,7 +5,7 @@
 
   let bannerDismissed = $state(false);
 
-  const queryExample = 'https://badge.example.com/badge.svg?label=build&message=passing&style=flatbar';
+  const queryExample = 'https://badge.example.com/badge.svg?label=build&message=passing&style=flatbar&size=125';
   const pathExample = 'https://badge.example.com/badge/release/stable.svg';
   const markdownExample = '![Build status](https://badge.example.com/badge.svg?label=build&message=passing)';
   const htmlExample = '<img src="https://badge.example.com/badge.svg?label=build&message=passing" alt="Build: passing">';
@@ -21,6 +21,7 @@ ETag: "<content hash>"`;
     { name: 'message', required: 'Required', fallback: '—', detail: 'Main badge text. Maximum 128 characters.' },
     { name: 'label', required: 'Optional', fallback: 'Empty', detail: 'Left-side badge text. Maximum 64 characters.' },
     { name: 'style', required: 'Optional', fallback: 'flat', detail: 'Selects one of the eight rendering styles.' },
+    { name: 'size', required: 'Optional', fallback: '100', detail: 'Scales the whole badge from 50 to 300 percent. Integer values only.' },
     { name: 'labelColor', required: 'Optional', fallback: '555555', detail: 'Background color for the label segment.' },
     { name: 'color', required: 'Optional', fallback: '44cc11', detail: 'Background color for the message segment.' },
     { name: 'labelTextColor', required: 'Optional', fallback: 'ffffff', detail: 'Text color for the label segment.' },
@@ -64,7 +65,7 @@ ETag: "<content hash>"`;
   <section class="reference-hero section-shell">
     <h1>Everything the badge link understands.</h1>
     <p>
-      Two endpoint shapes, eight looks, four color controls, and enough examples to keep guesswork out of the address bar.
+      Two endpoint shapes, eight looks, four color controls, and an exact size dial from 50% to 300%.
     </p>
   </section>
 
@@ -138,8 +139,9 @@ HEAD /badge/:label/:message
 
       <section id="colors" class="reference-section">
         <h2>Colors</h2>
-        <p>Use 3-digit or 6-digit hexadecimal values without the leading <code>#</code>.</p>
+        <p>The API uses 3-digit or 6-digit hexadecimal values without the leading <code>#</code>.</p>
         <div class="inline-example"><code>labelColor=292724&amp;color=d6ef53&amp;labelTextColor=ffffff&amp;textColor=292724</code></div>
+        <p>The maker keeps colors internally as RGB. Hex, HSL, and OKLCH channel inputs are converted to RGB before the URL is assembled.</p>
         <p>If a leading <code>#</code> is included, encode it as <code>%23</code> so it does not become a URL fragment.</p>
         <h3>Named colors</h3>
         <div class="color-name-list">{#each namedColors as color}<code>{color}</code>{/each}</div>
@@ -169,6 +171,7 @@ HEAD /badge/:label/:message
           <article><code>message</code><p>Required and limited to 128 characters.</p></article>
           <article><code>label</code><p>Optional and limited to 64 characters.</p></article>
           <article><code>style</code><p>Must match one of the documented style names.</p></article>
+          <article><code>size</code><p>Must be an integer percentage from 50 through 300.</p></article>
           <article><code>colors</code><p>Must be a supported name or a 3-digit or 6-digit hex value.</p></article>
         </div>
         <h3>Health check</h3>
