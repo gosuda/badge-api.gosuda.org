@@ -271,10 +271,7 @@
         Create a crisp SVG badge from a label, message, style, exact size, letter spacing, and color recipe—then copy one immutable URL for Markdown, project pages, profiles, or docs.
       </p>
       <div class="hero__actions">
-        <a class="btn btn--modern" href="#designer">
-          <span>Make a badge</span>
-          <span class="btn--modern__icon" aria-hidden="true">↗</span>
-        </a>
+        <a class="btn btn--push" href="#designer">Make a badge</a>
         <a class="text-link" href="#ideas">See where it can go</a>
       </div>
     </div>
