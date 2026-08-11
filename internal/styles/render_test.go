@@ -46,13 +46,6 @@ func TestEveryStyleAppliesLetterSpacing(t *testing.T) {
 	}
 }
 
-func TestFlatbarUsesRelaxedDefaultTracking(t *testing.T) {
-	svg := string(Render(Options{Label: "mood", Message: "loud", Style: "flatbar", Size: 100}))
-	if !strings.Contains(svg, `letter-spacing="0.45"`) {
-		t.Fatal("flatbar SVG does not apply its relaxed default tracking")
-	}
-}
-
 func TestReferenceExamplesPreserveExactArtwork(t *testing.T) {
 	tests := []struct {
 		name      string

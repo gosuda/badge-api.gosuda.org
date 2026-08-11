@@ -39,7 +39,7 @@ ETag: "<content hash>"`;
     ['outline', 'A framed surface with a brighter inner edge.'],
     ['neon', 'A focused glow around each color segment.'],
     ['glass', 'A layered sheen with a quiet border.'],
-    ['flatbar', 'A 28 px uppercase bar with relaxed 0.45 px built-in tracking.'],
+    ['flatbar', 'A 28 px uppercase bar inspired by larger badge styles.'],
     ['old-school', 'Old School 80×15: a fixed split-panel button with customizable colors and resolution-independent text that automatically shrinks to fit each panel.'],
     ['click-here', 'Click Here 88×31: the supplied raised gray artwork for its reference phrase, with high-resolution auto-fit vector text for custom copy.'],
     ['best-viewed', 'Best Viewed 88×31: the supplied BEST rail and Chrome artwork, with separately auto-scaled vector text for both custom lines.']

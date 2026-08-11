@@ -17,9 +17,8 @@ var badgeTextWidth = &runewidth.Condition{
 }
 
 func renderStandard(options Options, label, message string, spec styleSpec) []byte {
-	letterSpacing := spec.LetterSpacing + options.LetterSpacing
-	labelTextWidth := measureText(label, spec.FontSize, letterSpacing)
-	messageTextWidth := measureText(message, spec.FontSize, letterSpacing)
+	labelTextWidth := measureText(label, spec.FontSize, options.LetterSpacing)
+	messageTextWidth := measureText(message, spec.FontSize, options.LetterSpacing)
 	labelWidth := 0.0
 	if label != "" {
 		labelWidth = math.Ceil(labelTextWidth + spec.Padding*2)
@@ -56,7 +55,7 @@ func renderStandard(options Options, label, message string, spec styleSpec) []by
 	}
 	writeBackgrounds(&builder, spec, labelWidth, messageWidth, options)
 	builder.WriteString(`</g>`)
-	writeTexts(&builder, spec, label, message, labelWidth, messageWidth, labelTextWidth, messageTextWidth, letterSpacing, options)
+	writeTexts(&builder, spec, label, message, labelWidth, messageWidth, labelTextWidth, messageTextWidth, options.LetterSpacing, options)
 	builder.WriteString(`</svg>`)
 	return []byte(builder.String())
 }

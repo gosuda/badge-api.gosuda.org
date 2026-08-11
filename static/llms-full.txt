@@ -30,7 +30,6 @@ The API accepts 3-digit or 6-digit hexadecimal colors without a leading `#`, plu
 
 - Standard styles measure text with `github.com/mattn/go-runewidth`; UAX #29 grapheme segmentation ensures combining marks and emoji sequences receive spacing only between complete grapheme clusters.
 - `letterSpacing` widens or tightens text from -1 through 3 SVG user units and participates in badge width and adaptive font-size calculations.
-- `flatbar` adds 0.45 SVG units of built-in uppercase tracking before applying the caller's `letterSpacing` adjustment.
 - Standard SVG text uses `lengthAdjust="spacing"` to avoid stretching glyph shapes.
 - `old-school` renders a fixed 80×15 split-panel button. Each label and message font size is calculated independently from its available width and height.
 - `click-here` and `best-viewed` render fixed 88×31 buttons. Their supplied reference phrases preserve the original embedded SVG coordinates at `letterSpacing=0`; nonzero spacing and custom phrases use resolution-independent SVG text with an automatically fitted font size, `text-rendering="geometricPrecision"`, and `lengthAdjust="spacingAndGlyphs"`.

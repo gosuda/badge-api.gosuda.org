@@ -767,6 +767,14 @@ main.banner-dismissed {
   white-space: nowrap;
 }
 
+.style-option[data-style='flatbar'] .style-option__copy strong {
+  letter-spacing: 0.065em;
+}
+
+.style-option[data-style='flatbar'] .style-option__copy small {
+  letter-spacing: 0.04em;
+}
+
 .color-editor {
   padding: var(--space-md);
   border-radius: var(--radius-card);

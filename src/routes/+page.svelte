@@ -366,7 +366,7 @@
             <span class="size-range"><span>{minSize}%</span><span>{maxSize}%</span></span>
           </div>
           <div class="size-control letter-spacing-control">
-            <span id="letter-spacing-label" class="field-label">Letter spacing adjustment</span>
+            <span id="letter-spacing-label" class="field-label">Letter spacing</span>
             <input
               id="letter-spacing"
               class="size-slider"

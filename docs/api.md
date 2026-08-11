@@ -100,7 +100,7 @@ https://badge.example.com/badge.svg?label=release&message=ready&letterSpacing=0.
 | `outline` | Framed badge surface. |
 | `neon` | Badge with a focused glow. |
 | `glass` | Layered highlight and border. |
-| `flatbar` | 28 px square badge with uppercase text and relaxed `0.45` px built-in tracking. |
+| `flatbar` | 28 px square badge with uppercase text. |
 | `old-school` | Fixed 80×15 split-panel button with resolution-independent text that automatically shrinks to fit. |
 | `click-here` | Fixed 88×31 raised reference artwork with auto-fit vector text for custom copy. |
 | `best-viewed` | Fixed 88×31 BEST rail and Chrome artwork with independently auto-scaled text lines. |

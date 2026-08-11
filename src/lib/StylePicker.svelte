@@ -48,7 +48,7 @@
   <legend class="field-label">Pick an outfit</legend>
   <div class="style-picker__grid">
     {#each styles as style}
-      <label class:selected={value === style.id} class="style-option">
+      <label class:selected={value === style.id} class="style-option" data-style={style.id}>
         <input type="radio" name="badge-style" value={style.id} bind:group={value} />
         <span class="style-option__preview"><img src={sampleURL(style)} alt="" loading="lazy" decoding="async" /></span>
         <span class="style-option__copy">
