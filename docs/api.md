@@ -61,6 +61,7 @@ The path endpoint removes a final `.svg` suffix from the message. The query endp
 | `label` | No | Empty | Left-side badge text. Maximum 64 characters. |
 | `style` | No | `flat` | Badge rendering style. |
 | `size` | No | `100` | Whole-badge scale percentage. Integer from `50` through `300`. |
+| `letterSpacing` | No | `0` | Extra spacing between grapheme clusters in SVG pixels. Decimal from `-1` through `3`. |
 | `labelColor` | No | `555555` | Label background color. |
 | `color` | No | `44cc11` | Message background color. |
 | `labelTextColor` | No | `ffffff` | Label text color. |
@@ -80,6 +81,14 @@ https://badge.example.com/badge.svg?label=release&message=ready&size=150
 
 The SVG keeps each style's original proportions. The `width` and `height` attributes scale while the internal `viewBox` remains stable.
 
+Adjust the text tracking:
+
+```text
+https://badge.example.com/badge.svg?label=release&message=ready&letterSpacing=0.5
+```
+
+`letterSpacing` accepts decimal SVG user units from `-1` through `3`; at 100% scale, one unit is one output pixel. The whole badge scales the spacing with `size`. A value of `0` preserves the exact supplied word artwork in the `click-here` and `best-viewed` reference phrases; a nonzero value switches those phrases to adjustable vector text.
+
 ## Styles
 
 | Style | Notes |
@@ -91,7 +100,7 @@ The SVG keeps each style's original proportions. The `width` and `height` attrib
 | `outline` | Framed badge surface. |
 | `neon` | Badge with a focused glow. |
 | `glass` | Layered highlight and border. |
-| `flatbar` | 28 px square badge with uppercase text. |
+| `flatbar` | 28 px square badge with uppercase text and relaxed `0.45` px built-in tracking. |
 | `old-school` | Fixed 80×15 split-panel button with resolution-independent text that automatically shrinks to fit. |
 | `click-here` | Fixed 88×31 raised reference artwork with auto-fit vector text for custom copy. |
 | `best-viewed` | Fixed 88×31 BEST rail and Chrome artwork with independently auto-scaled text lines. |
@@ -199,6 +208,7 @@ Examples of invalid input:
 /badge.svg?message=ready&color=not-a-color
 /badge.svg?message=ready&size=49
 /badge.svg?message=ready&size=large
+/badge.svg?message=ready&letterSpacing=3.1
 ```
 
 The health endpoint is available at:

@@ -9,6 +9,8 @@
 
   const minSize = 50;
   const maxSize = 300;
+  const minLetterSpacing = -1;
+  const maxLetterSpacing = 3;
   const styleHeights = {
     flat: 20,
     'flat-square': 20,
@@ -29,7 +31,7 @@
     textColor: { r: 41, g: 39, b: 36 }
   };
 
-  const seoDescription = 'Create customizable SVG badges with eleven styles, including classic 80×15 and 88×31 web buttons with auto-scaling vector text, exact 50–300% sizing, RGB, HSL, and OKLCH controls, Unicode-aware width, immutable caching, and shareable URLs.';
+  const seoDescription = 'Create customizable SVG badges with eleven styles, including classic 80×15 and 88×31 web buttons with auto-scaling vector text, exact 50–300% sizing, adjustable letter spacing, RGB, HSL, and OKLCH controls, Unicode-aware width, immutable caching, and shareable URLs.';
   const homeStructuredData = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -66,6 +68,7 @@
         featureList: [
           'Eleven SVG badge styles, including fixed 80 by 15 and 88 by 31 pixel buttons',
           'Exact size scaling from 50 to 300 percent',
+          'Adjustable letter spacing from -1 to 3 SVG pixels',
           'Hex, RGB, HSL, and OKLCH color controls',
           'Unicode-aware text measurement',
           'Immutable badge URLs with ETags'
@@ -97,12 +100,16 @@
   let size = $state(100);
   let sizeText = $state('100');
   let sizeInputFocused = $state(false);
+  let letterSpacing = $state(0);
+  let letterSpacingText = $state('0');
+  let letterSpacingInputFocused = $state(false);
   let colors = $state(copyColors(defaultColors));
   let requestState = $state({
     label: 'tiny',
     message: 'but mighty',
     style: 'flat',
     size: 100,
+    letterSpacing: 0,
     colors: copyColors(defaultColors)
   });
   let previewZoom = $state(2);
@@ -115,13 +122,23 @@
 
   const previewHeight = $derived((styleHeights[requestState.style] * requestState.size) / 100);
   const exactSizeValid = $derived(Number.isInteger(Number(sizeText)) && Number(sizeText) >= minSize && Number(sizeText) <= maxSize);
+  const exactLetterSpacingValid = $derived(
+    letterSpacingText.trim() !== '' &&
+      Number.isFinite(Number(letterSpacingText)) &&
+      Number(letterSpacingText) >= minLetterSpacing &&
+      Number(letterSpacingText) <= maxLetterSpacing
+  );
 
   $effect(() => {
     if (!sizeInputFocused) sizeText = String(size);
   });
+  $effect(() => {
+    if (!letterSpacingInputFocused) letterSpacingText = formatLetterSpacing(letterSpacing);
+  });
+
 
   $effect(() => {
-    const next = { label, message, style, size, colors: copyColors(colors) };
+    const next = { label, message, style, size, letterSpacing, colors: copyColors(colors) };
     previewPending = true;
     const timeout = setTimeout(() => {
       requestState = next;
@@ -130,7 +147,7 @@
     return () => clearTimeout(timeout);
   });
 
-  const badgePath = $derived(buildBadgePath({ label, message, style, size, colors }));
+  const badgePath = $derived(buildBadgePath({ label, message, style, size, letterSpacing, colors }));
   const previewPath = $derived(buildBadgePath(requestState));
   const badgeURL = $derived(origin ? `${origin}${badgePath}` : badgePath);
   const markdownEmbed = $derived(`![${markdownAlt(label, message)}](${badgeURL})`);
@@ -154,6 +171,7 @@
       message: options.message,
       style: options.style,
       size: String(options.size),
+      letterSpacing: String(options.letterSpacing),
       labelColor: rgbToHex(options.colors.labelColor).slice(1),
       color: rgbToHex(options.colors.color).slice(1),
       labelTextColor: rgbToHex(options.colors.labelTextColor).slice(1),
@@ -181,6 +199,27 @@
     sizeInputFocused = false;
     sizeText = String(size);
   }
+  function setLetterSpacingFromRange(event) {
+    letterSpacing = Number(event.currentTarget.value);
+  }
+
+  function editExactLetterSpacing(event) {
+    letterSpacingText = event.currentTarget.value;
+    const next = Number(letterSpacingText);
+    if (letterSpacingText.trim() !== '' && Number.isFinite(next) && next >= minLetterSpacing && next <= maxLetterSpacing) {
+      letterSpacing = next;
+    }
+  }
+
+  function blurExactLetterSpacing() {
+    letterSpacingInputFocused = false;
+    letterSpacingText = formatLetterSpacing(letterSpacing);
+  }
+
+  function formatLetterSpacing(value) {
+    return String(Number(value.toFixed(2)));
+  }
+
 
   function formatPixels(value) {
     return Number.isInteger(value) ? String(value) : value.toFixed(1);
@@ -229,7 +268,7 @@
     <div class="hero__copy">
       <h1>A tiny SVG badge<br />with a lot to say.</h1>
       <p>
-        Create a crisp SVG badge from a label, message, style, exact size, and color recipe—then copy one immutable URL for Markdown, project pages, profiles, or docs.
+        Create a crisp SVG badge from a label, message, style, exact size, letter spacing, and color recipe—then copy one immutable URL for Markdown, project pages, profiles, or docs.
       </p>
       <div class="hero__actions">
         <a class="btn btn--push" href="#designer">Make a badge</a>
@@ -256,7 +295,7 @@
     <div class="section-shell designer-heading">
       <div>
         <h2>Make your SVG badge</h2>
-        <p>Tweak the words, choose one of eleven styles, set an exact size, and tune every color channel.</p>
+        <p>Tweak the words, choose one of eleven styles, set an exact size and letter spacing, and tune every color channel.</p>
       </div>
       <code>No wrong turns</code>
     </div>
@@ -290,9 +329,9 @@
 
         <section class="control-section">
           <div class="section-title-row">
-            <h3>Size</h3>
+            <h3>Size &amp; spacing</h3>
           </div>
-          <p id="size-help" class="control-intro">Slide in broad strokes, then type the exact percentage when you want to be picky.</p>
+          <p id="size-help" class="control-intro">Set the overall scale, then give the letters more room—or pull them a little closer.</p>
           <div class="size-control">
             <span id="badge-size-label" class="field-label">Badge scale</span>
             <input
@@ -325,6 +364,39 @@
               <span aria-hidden="true">%</span>
             </span>
             <span class="size-range"><span>{minSize}%</span><span>{maxSize}%</span></span>
+          </div>
+          <div class="size-control letter-spacing-control">
+            <span id="letter-spacing-label" class="field-label">Letter spacing adjustment</span>
+            <input
+              id="letter-spacing"
+              class="size-slider"
+              type="range"
+              min={minLetterSpacing}
+              max={maxLetterSpacing}
+              step="0.05"
+              value={letterSpacing}
+              aria-labelledby="letter-spacing-label"
+              aria-describedby="letter-spacing-help"
+              oninput={setLetterSpacingFromRange}
+            />
+            <span class:error={!exactLetterSpacingValid} class="size-exact-control">
+              <input
+                id="letter-spacing-exact"
+                type="number"
+                min={minLetterSpacing}
+                max={maxLetterSpacing}
+                step="0.05"
+                value={letterSpacingText}
+                aria-label="Exact letter spacing in pixels"
+                aria-invalid={!exactLetterSpacingValid}
+                aria-describedby="letter-spacing-help"
+                onfocus={() => (letterSpacingInputFocused = true)}
+                oninput={editExactLetterSpacing}
+                onblur={blurExactLetterSpacing}
+              />
+              <span aria-hidden="true">px</span>
+            </span>
+            <span id="letter-spacing-help" class="size-range"><span>{minLetterSpacing} px</span><span>{maxLetterSpacing} px</span></span>
           </div>
         </section>
 
@@ -361,6 +433,7 @@
           <div class="preview-meta">
             <span>{requestState.size}% scale</span>
             <span>{formatPixels(previewHeight)} px tall</span>
+            <span>{formatLetterSpacing(requestState.letterSpacing)} px tracking</span>
           </div>
         </div>
 

@@ -1,11 +1,11 @@
 package main
 
 import (
+	"badge-api.gosuda.org/internal/styles"
 	"fmt"
+	"math"
 	"strings"
 	"unicode/utf8"
-
-	"badge-api.gosuda.org/internal/styles"
 )
 
 type badgeOptions struct {
@@ -17,12 +17,15 @@ type badgeOptions struct {
 	LabelTextColor   string
 	MessageTextColor string
 	Size             int
+	LetterSpacing    float64
 }
 
 const (
 	defaultBadgeSize = 100
 	minBadgeSize     = 50
 	maxBadgeSize     = 300
+	minLetterSpacing = -1.0
+	maxLetterSpacing = 3.0
 )
 
 var namedColors = map[string]string{
@@ -87,6 +90,10 @@ func validateBadgeOptions(options badgeOptions) (badgeOptions, error) {
 	if options.Size < minBadgeSize || options.Size > maxBadgeSize {
 		return badgeOptions{}, fmt.Errorf("size must be between %d and %d percent", minBadgeSize, maxBadgeSize)
 	}
+	if math.IsNaN(options.LetterSpacing) || math.IsInf(options.LetterSpacing, 0) ||
+		options.LetterSpacing < minLetterSpacing || options.LetterSpacing > maxLetterSpacing {
+		return badgeOptions{}, fmt.Errorf("letterSpacing must be between %g and %g pixels", minLetterSpacing, maxLetterSpacing)
+	}
 	if options.Message == "" {
 		return badgeOptions{}, fmt.Errorf("message is required")
 	}
@@ -123,5 +130,6 @@ func renderBadge(options badgeOptions) []byte {
 		LabelTextColor:   options.LabelTextColor,
 		MessageTextColor: options.MessageTextColor,
 		Size:             options.Size,
+		LetterSpacing:    options.LetterSpacing,
 	})
 }

@@ -25,7 +25,7 @@ func renderClickHere(options Options, label, message string) []byte {
 	phrase := strings.TrimSpace(strings.TrimSpace(label) + " " + strings.TrimSpace(message))
 
 	// Use reference for default "click here" text
-	if strings.EqualFold(phrase, "click here") {
+	if options.LetterSpacing == 0 && strings.EqualFold(phrase, "click here") {
 		var builder strings.Builder
 		builder.Grow(len(clickHereReferenceArtwork) + 1800)
 		writeFixedSVGStart(&builder, clickHereMinWidth, clickHereHeight, options.Size, accessibleLabel(label, message))
@@ -35,7 +35,7 @@ func renderClickHere(options Options, label, message string) []byte {
 	}
 
 	// Variable width for custom text
-	textWidth := int(math.Ceil(measureText(strings.ToUpper(phrase), 7))) + 12
+	textWidth := int(math.Ceil(measureText(strings.ToUpper(phrase), 7, options.LetterSpacing))) + 12
 	totalWidth := textWidth + 10 // 5px left cap + text + 5px right cap
 	totalWidth = max(clickHereMinWidth, min(totalWidth, clickHereMaxWidth))
 	textBoxWidth := totalWidth - 10
@@ -66,7 +66,7 @@ func renderClickHere(options Options, label, message string) []byte {
 	builder.WriteString(`<rect x="3" y="3" width="`)
 	builder.WriteString(number(float64(textBoxWidth)))
 	builder.WriteString(`" height="24" fill="#cccccc"/>`)
-	writeAdaptiveText(&builder, phrase, adaptiveTextBox{X: 5, Y: 5, Width: float64(textBoxWidth - 4), Height: 20, MaxFontSize: 11}, "3a0603", true, true)
+	writeAdaptiveText(&builder, phrase, adaptiveTextBox{X: 5, Y: 5, Width: float64(textBoxWidth - 4), Height: 20, MaxFontSize: 11}, "3a0603", options.LetterSpacing, true, true)
 
 	// Red arrow (right side)
 	arrowX := totalWidth - 9

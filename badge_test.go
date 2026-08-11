@@ -194,6 +194,50 @@ func TestBadgeHandlerAppliesExactSize(t *testing.T) {
 		t.Fatalf("height = %q, want 30", root.Height)
 	}
 }
+func TestBadgeHandlerAppliesLetterSpacing(t *testing.T) {
+	handler := newHandler()
+	baseRequest := httptest.NewRequest(http.MethodGet, "/badge.svg?label=build&message=ready&style=flat", nil)
+	baseResponse := httptest.NewRecorder()
+	handler.ServeHTTP(baseResponse, baseRequest)
+
+	spacedRequest := httptest.NewRequest(http.MethodGet, "/badge.svg?label=build&message=ready&style=flat&letterSpacing=0.5", nil)
+	spacedResponse := httptest.NewRecorder()
+	handler.ServeHTTP(spacedResponse, spacedRequest)
+	if spacedResponse.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", spacedResponse.Code, http.StatusOK)
+	}
+	if !strings.Contains(spacedResponse.Body.String(), `letter-spacing="0.5"`) {
+		t.Fatal("SVG does not contain requested letter spacing")
+	}
+
+	baseWidth, err := strconv.ParseFloat(parseSVGRoot(t, baseResponse.Body.Bytes()).Width, 64)
+	if err != nil {
+		t.Fatal(err)
+	}
+	spacedWidth, err := strconv.ParseFloat(parseSVGRoot(t, spacedResponse.Body.Bytes()).Width, 64)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if spacedWidth <= baseWidth {
+		t.Fatalf("spaced width = %v, want greater than base width %v", spacedWidth, baseWidth)
+	}
+}
+
+func TestBadgeHandlerRejectsInvalidLetterSpacing(t *testing.T) {
+	for _, spacing := range []string{"", "-1.01", "3.01", "wide", "NaN", "%2BInf"} {
+		t.Run(spacing, func(t *testing.T) {
+			request := httptest.NewRequest(http.MethodGet, "/badge.svg?message=ready&letterSpacing="+spacing, nil)
+			response := httptest.NewRecorder()
+			newHandler().ServeHTTP(response, request)
+			if response.Code != http.StatusBadRequest {
+				t.Fatalf("status = %d, want %d", response.Code, http.StatusBadRequest)
+			}
+			if got := response.Header().Get("Cache-Control"); got != "no-store" {
+				t.Fatalf("Cache-Control = %q, want no-store", got)
+			}
+		})
+	}
+}
 
 func TestOldSchoolStyleUsesFixedPixelGeometry(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "/badge.svg?label=pixel&message=button&style=old-school&labelColor=ff5a18&color=a8a979&size=100", nil)

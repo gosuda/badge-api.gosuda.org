@@ -7,7 +7,7 @@
   let bannerDismissed = $state(false);
 
   const productionOrigin = 'https://badge-api.gosuda.org';
-  const queryExample = `${productionOrigin}/badge.svg?label=build&message=passing&style=flatbar&size=125`;
+  const queryExample = `${productionOrigin}/badge.svg?label=build&message=passing&style=flatbar&size=125&letterSpacing=0.5`;
   const pathExample = `${productionOrigin}/badge/release/stable.svg`;
   const markdownExample = `![Build status](${productionOrigin}/badge.svg?label=build&message=passing)`;
   const htmlExample = `<img src="${productionOrigin}/badge.svg?label=build&message=passing" alt="Build: passing">`;
@@ -24,6 +24,7 @@ ETag: "<content hash>"`;
     { name: 'label', required: 'Optional', fallback: 'Empty', detail: 'Left-side badge text. Maximum 64 characters.' },
     { name: 'style', required: 'Optional', fallback: 'flat', detail: 'Selects one of the eleven rendering styles.' },
     { name: 'size', required: 'Optional', fallback: '100', detail: 'Scales the whole badge from 50 to 300 percent. Integer values only.' },
+    { name: 'letterSpacing', required: 'Optional', fallback: '0', detail: 'Adds -1 to 3 SVG pixels between grapheme clusters. Decimal values are accepted.' },
     { name: 'labelColor', required: 'Optional', fallback: '555555', detail: 'Background color for the label segment.' },
     { name: 'color', required: 'Optional', fallback: '44cc11', detail: 'Background color for the message segment.' },
     { name: 'labelTextColor', required: 'Optional', fallback: 'ffffff', detail: 'Text color for the label segment.' },
@@ -38,7 +39,7 @@ ETag: "<content hash>"`;
     ['outline', 'A framed surface with a brighter inner edge.'],
     ['neon', 'A focused glow around each color segment.'],
     ['glass', 'A layered sheen with a quiet border.'],
-    ['flatbar', 'A 28 px uppercase bar inspired by larger badge styles.'],
+    ['flatbar', 'A 28 px uppercase bar with relaxed 0.45 px built-in tracking.'],
     ['old-school', 'Old School 80×15: a fixed split-panel button with customizable colors and resolution-independent text that automatically shrinks to fit each panel.'],
     ['click-here', 'Click Here 88×31: the supplied raised gray artwork for its reference phrase, with high-resolution auto-fit vector text for custom copy.'],
     ['best-viewed', 'Best Viewed 88×31: the supplied BEST rail and Chrome artwork, with separately auto-scaled vector text for both custom lines.']
@@ -77,7 +78,7 @@ ETag: "<content hash>"`;
     ['errors', 'Errors']
   ];
 
-  const seoDescription = 'Read the Tiny Badge SVG API reference for endpoints, parameters, eleven styles including classic 80×15 and 88×31 buttons with auto-scaling vector text, colors, 50–300% sizing, Unicode width, ETags, immutable caching, examples, and errors.';
+  const seoDescription = 'Read the Tiny Badge SVG API reference for endpoints, parameters, eleven styles including classic 80×15 and 88×31 buttons with auto-scaling vector text, colors, 50–300% sizing, adjustable letter spacing, Unicode width, ETags, immutable caching, examples, and errors.';
   const referenceStructuredData = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -88,7 +89,7 @@ ETag: "<content hash>"`;
         description: seoDescription,
         url: 'https://badge-api.gosuda.org/reference/',
         mainEntityOfPage: 'https://badge-api.gosuda.org/reference/',
-        dateModified: '2026-08-10',
+        dateModified: '2026-08-11',
         inLanguage: 'en',
         author: { '@id': 'https://badge-api.gosuda.org/#organization' },
         publisher: { '@id': 'https://badge-api.gosuda.org/#organization' },
@@ -125,7 +126,7 @@ ETag: "<content hash>"`;
   description={seoDescription}
   path="/reference/"
   type="article"
-  modifiedTime="2026-08-10T00:00:00Z"
+  modifiedTime="2026-08-11T00:00:00Z"
   structuredData={referenceStructuredData}
 />
 
@@ -135,7 +136,7 @@ ETag: "<content hash>"`;
   <section class="reference-hero section-shell">
     <h1>Everything the SVG badge API understands.</h1>
     <p>
-      Query and path endpoints, eleven rendering styles including three fixed-size classics with auto-scaling vector text, exact 50–300% sizing, four color controls, Unicode-aware width, immutable cache headers, ETags, and practical examples.
+      Query and path endpoints, eleven rendering styles including three fixed-size classics with auto-scaling vector text, exact 50–300% sizing, adjustable letter spacing, four color controls, Unicode-aware width, immutable cache headers, ETags, and practical examples.
     </p>
   </section>
 
@@ -152,7 +153,7 @@ ETag: "<content hash>"`;
       <section id="overview" class="reference-section">
         <h2>Overview</h2>
         <p>
-          Tiny Badge returns a deterministic SVG image from the label, message, style, size, and colors encoded in the request URL. Unicode graphemes are measured with <code>go-runewidth</code>, successful responses use long-lived immutable caching and content-derived ETags, and the same URL always describes the same badge.
+          Tiny Badge returns a deterministic SVG image from the label, message, style, size, letter spacing, and colors encoded in the request URL. Unicode graphemes are measured with <code>go-runewidth</code> and UAX #29 segmentation, successful responses use long-lived immutable caching and content-derived ETags, and the same URL always describes the same badge.
         </p>
         <div class="reference-callout">
           <strong>Production origin</strong>
@@ -192,6 +193,7 @@ HEAD /badge/:label/:message
           {/each}
         </div>
         <p>Spaces and punctuation must be URL encoded. For example, <code>ready to ship</code> becomes <code>ready%20to%20ship</code>.</p>
+        <p><code>letterSpacing</code> is measured in SVG user units: one unit is one output pixel at 100% scale. Nonzero spacing replaces the fixed word artwork in matching <code>click-here</code> and <code>best-viewed</code> reference phrases with adjustable vector text.</p>
       </section>
 
       <section id="styles" class="reference-section">
@@ -242,6 +244,7 @@ HEAD /badge/:label/:message
           <article><code>label</code><p>Optional and limited to 64 characters.</p></article>
           <article><code>style</code><p>Must match one of the documented style names.</p></article>
           <article><code>size</code><p>Must be an integer percentage from 50 through 300.</p></article>
+          <article><code>letterSpacing</code><p>Must be a decimal number from -1 through 3.</p></article>
           <article><code>colors</code><p>Must be a supported name or a 3-digit or 6-digit hex value.</p></article>
         </div>
         <h3>Health check</h3>

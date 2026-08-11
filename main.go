@@ -172,6 +172,14 @@ func badgeOptionsFromRequest(request *http.Request, params httprouter.Params) (b
 		}
 		size = parsed
 	}
+	letterSpacing := 0.0
+	if query.Has("letterSpacing") {
+		parsed, err := strconv.ParseFloat(strings.TrimSpace(query.Get("letterSpacing")), 64)
+		if err != nil {
+			return badgeOptions{}, fmt.Errorf("letterSpacing must be a number")
+		}
+		letterSpacing = parsed
+	}
 
 	return validateBadgeOptions(badgeOptions{
 		Label:            label,
@@ -182,6 +190,7 @@ func badgeOptionsFromRequest(request *http.Request, params httprouter.Params) (b
 		LabelTextColor:   query.Get("labelTextColor"),
 		MessageTextColor: query.Get("textColor"),
 		Size:             size,
+		LetterSpacing:    letterSpacing,
 	})
 }
 

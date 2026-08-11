@@ -603,6 +603,10 @@ main.banner-dismissed {
   grid-area: label;
   margin: 0;
 }
+.letter-spacing-control {
+  margin-top: var(--space-lg);
+}
+
 
 .size-slider {
   grid-area: slider;
@@ -751,12 +755,14 @@ main.banner-dismissed {
 
 .style-option__copy strong {
   font-size: var(--text-sm);
+  letter-spacing: 0.03em;
 }
 
 .style-option__copy small {
   overflow: hidden;
   color: var(--color-muted);
   font-size: var(--text-xs);
+  letter-spacing: 0.025em;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

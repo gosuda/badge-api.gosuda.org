@@ -15,7 +15,8 @@ var bestViewedReferenceArtwork = referenceArtwork(bestViewedReferenceSVG)
 var bestViewedStyle = styleSpec{Height: classicHeight, Kind: "best-viewed", Render: renderBestViewed}
 
 func renderBestViewed(options Options, label, message string) []byte {
-	isDefault := strings.EqualFold(strings.TrimSpace(label), "viewed with") &&
+	isDefault := options.LetterSpacing == 0 &&
+		strings.EqualFold(strings.TrimSpace(label), "viewed with") &&
 		strings.EqualFold(strings.TrimSpace(message), "chrome")
 
 	// Use reference artwork for the default phrase
@@ -39,10 +40,10 @@ func renderBestViewed(options Options, label, message string) []byte {
 
 	textNeeded := 0
 	if label == "" {
-		textNeeded = int(math.Ceil(measureText(strings.ToUpper(message), 10)))
+		textNeeded = int(math.Ceil(measureText(strings.ToUpper(message), 10, options.LetterSpacing)))
 	} else {
-		labelNeeded := int(math.Ceil(measureText(strings.ToUpper(label), 5)))
-		messageNeeded := int(math.Ceil(measureText(strings.ToUpper(message), 8)))
+		labelNeeded := int(math.Ceil(measureText(strings.ToUpper(label), 5, options.LetterSpacing)))
+		messageNeeded := int(math.Ceil(measureText(strings.ToUpper(message), 8, options.LetterSpacing)))
 		textNeeded = max(labelNeeded, messageNeeded)
 	}
 	textPanelWidth := textNeeded + textPadding*2
@@ -82,10 +83,10 @@ func renderBestViewed(options Options, label, message string) []byte {
 	textBoxX := float64(redPanelWidth + 1)
 	textBoxWidth := float64(textPanelWidth - 2)
 	if label == "" {
-		writeAdaptiveText(&builder, message, adaptiveTextBox{X: textBoxX, Y: 5, Width: textBoxWidth, Height: 20, MaxFontSize: 15}, "777777", true, true)
+		writeAdaptiveText(&builder, message, adaptiveTextBox{X: textBoxX, Y: 5, Width: textBoxWidth, Height: 20, MaxFontSize: 15}, "777777", options.LetterSpacing, true, true)
 	} else {
-		writeAdaptiveText(&builder, label, adaptiveTextBox{X: textBoxX, Y: 4, Width: textBoxWidth, Height: 8, MaxFontSize: 7}, "0d0d0d", true, true)
-		writeAdaptiveText(&builder, message, adaptiveTextBox{X: textBoxX, Y: 13, Width: textBoxWidth, Height: 13, MaxFontSize: 11}, "777777", true, true)
+		writeAdaptiveText(&builder, label, adaptiveTextBox{X: textBoxX, Y: 4, Width: textBoxWidth, Height: 8, MaxFontSize: 7}, "0d0d0d", options.LetterSpacing, true, true)
+		writeAdaptiveText(&builder, message, adaptiveTextBox{X: textBoxX, Y: 13, Width: textBoxWidth, Height: 13, MaxFontSize: 11}, "777777", options.LetterSpacing, true, true)
 	}
 
 	writeChromeLogo(&builder, totalWidth-logoWidth)

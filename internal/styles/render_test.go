@@ -8,16 +8,48 @@ import (
 )
 
 func TestMeasureTextUsesUnicodeDisplayWidth(t *testing.T) {
-	plain := measureText("e", 11)
-	if got := measureText("e\u0301", 11); got != plain {
+	plain := measureText("e", 11, 0)
+	if got := measureText("e\u0301", 11, 0); got != plain {
 		t.Fatalf("combining text width = %v, want %v", got, plain)
 	}
-	wide := measureText("界", 11)
-	if wide <= measureText("a", 11) {
+	wide := measureText("界", 11, 0)
+	if wide <= measureText("a", 11, 0) {
 		t.Fatalf("CJK width = %v, want wider than ASCII", wide)
 	}
-	if emoji := measureText("👩‍💻", 11); emoji != wide {
+	if emoji := measureText("👩‍💻", 11, 0); emoji != wide {
 		t.Fatalf("emoji grapheme width = %v, want %v", emoji, wide)
+	}
+}
+
+func TestMeasureTextAppliesSpacingBetweenGraphemeClusters(t *testing.T) {
+	const spacing = 0.5
+	base := measureText("e\u0301x", 11, 0)
+	spaced := measureText("e\u0301x", 11, spacing)
+	if got := spaced - base; math.Abs(got-spacing) > 1e-9 {
+		t.Fatalf("spacing width adjustment = %v, want %v", got, spacing)
+	}
+}
+func TestEveryStyleAppliesLetterSpacing(t *testing.T) {
+	for _, style := range Available() {
+		t.Run(style, func(t *testing.T) {
+			svg := string(Render(Options{
+				Label:         "build",
+				Message:       "ready",
+				Style:         style,
+				Size:          100,
+				LetterSpacing: 0.5,
+			}))
+			if !strings.Contains(svg, `letter-spacing="`) {
+				t.Fatal("SVG does not apply requested letter spacing")
+			}
+		})
+	}
+}
+
+func TestFlatbarUsesRelaxedDefaultTracking(t *testing.T) {
+	svg := string(Render(Options{Label: "mood", Message: "loud", Style: "flatbar", Size: 100}))
+	if !strings.Contains(svg, `letter-spacing="0.45"`) {
+		t.Fatal("flatbar SVG does not apply its relaxed default tracking")
 	}
 }
 
@@ -49,6 +81,12 @@ func TestReferenceExamplesPreserveExactArtwork(t *testing.T) {
 			if !strings.Contains(refSVG, test.artwork) {
 				t.Fatal("reference artwork coordinates were not preserved verbatim")
 			}
+			spacedReference := test.reference
+			spacedReference.LetterSpacing = 0.5
+			spacedSVG := string(Render(spacedReference))
+			if strings.Contains(spacedSVG, test.artwork) || !strings.Contains(spacedSVG, `letter-spacing="0.5"`) {
+				t.Fatal("letter spacing should replace fixed artwork with adjustable vector text")
+			}
 
 			// Custom text generates procedural frames and adaptive text
 			customSVG := string(Render(test.custom))
@@ -68,8 +106,8 @@ func TestReferenceExamplesPreserveExactArtwork(t *testing.T) {
 
 func TestAdaptiveFontSizeShrinksForLongText(t *testing.T) {
 	box := adaptiveTextBox{Width: 47, Height: 20, MaxFontSize: 11}
-	short := adaptiveFontSize("GO", box)
-	long := adaptiveFontSize("A VERY LONG STATUS MESSAGE", box)
+	short := adaptiveFontSize("GO", box, 0)
+	long := adaptiveFontSize("A VERY LONG STATUS MESSAGE", box, 0)
 	if short != box.MaxFontSize {
 		t.Fatalf("short font size = %v, want maximum %v", short, box.MaxFontSize)
 	}
@@ -101,7 +139,7 @@ func TestRetroVariableWidthFormula(t *testing.T) {
 			{"", "ok"},
 			{"a very long label with many words", "and an equally long message right here"},
 		} {
-			lp, mp, total := calculateOldSchoolWidths(c.label, c.msg)
+			lp, mp, total := calculateOldSchoolWidths(c.label, c.msg, 0)
 			want := total - 5 // borderAndGaps: 2px border + 1px gap + 2px border
 			if c.label == "" {
 				want = total - 4 // no gap when there is no label panel
@@ -120,7 +158,7 @@ func TestRetroVariableWidthFormula(t *testing.T) {
 	t.Run("click-here measures uppercase at 7px", func(t *testing.T) {
 		phrase := "ship now"
 		upper := strings.ToUpper(phrase)
-		needed := int(math.Ceil(measureText(upper, 7))) + 12 + 10
+		needed := int(math.Ceil(measureText(upper, 7, 0))) + 12 + 10
 		want := max(clickHereMinWidth, min(needed, clickHereMaxWidth))
 		svg := string(Render(Options{Label: "", Message: phrase, Style: "click-here", Size: 100}))
 		if got := viewBoxWidth(t, svg); got != float64(want) {

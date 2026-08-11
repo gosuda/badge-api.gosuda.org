@@ -7,6 +7,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/clipperhouse/uax29/v2/graphemes"
 	"github.com/mattn/go-runewidth"
 )
 
@@ -16,8 +17,9 @@ var badgeTextWidth = &runewidth.Condition{
 }
 
 func renderStandard(options Options, label, message string, spec styleSpec) []byte {
-	labelTextWidth := measureText(label, spec.FontSize)
-	messageTextWidth := measureText(message, spec.FontSize)
+	letterSpacing := spec.LetterSpacing + options.LetterSpacing
+	labelTextWidth := measureText(label, spec.FontSize, letterSpacing)
+	messageTextWidth := measureText(message, spec.FontSize, letterSpacing)
 	labelWidth := 0.0
 	if label != "" {
 		labelWidth = math.Ceil(labelTextWidth + spec.Padding*2)
@@ -54,7 +56,7 @@ func renderStandard(options Options, label, message string, spec styleSpec) []by
 	}
 	writeBackgrounds(&builder, spec, labelWidth, messageWidth, options)
 	builder.WriteString(`</g>`)
-	writeTexts(&builder, spec, label, message, labelWidth, messageWidth, labelTextWidth, messageTextWidth, options)
+	writeTexts(&builder, spec, label, message, labelWidth, messageWidth, labelTextWidth, messageTextWidth, letterSpacing, options)
 	builder.WriteString(`</svg>`)
 	return []byte(builder.String())
 }
@@ -122,26 +124,32 @@ func writeRect(builder *strings.Builder, x, width, height float64, color, kind, 
 	builder.WriteString(`/>`)
 }
 
-func writeTexts(builder *strings.Builder, spec styleSpec, label, message string, labelWidth, messageWidth, labelTextWidth, messageTextWidth float64, options Options) {
+func writeTexts(builder *strings.Builder, spec styleSpec, label, message string, labelWidth, messageWidth, labelTextWidth, messageTextWidth, letterSpacing float64, options Options) {
 	y := spec.Height/2 + spec.FontSize*0.34
 	builder.WriteString(`<g text-anchor="middle" font-family="Verdana, Geneva, DejaVu Sans, sans-serif" font-size="`)
 	builder.WriteString(number(spec.FontSize))
 	builder.WriteString(`" text-rendering="geometricPrecision">`)
 	if label != "" {
-		writeText(builder, label, labelWidth/2, y, labelTextWidth, options.LabelTextColor, spec.BoldLabel)
+		writeText(builder, label, labelWidth/2, y, labelTextWidth, options.LabelTextColor, letterSpacing, spec.BoldLabel)
 	}
-	writeText(builder, message, labelWidth+messageWidth/2, y, messageTextWidth, options.MessageTextColor, spec.BoldMessage)
+	writeText(builder, message, labelWidth+messageWidth/2, y, messageTextWidth, options.MessageTextColor, letterSpacing, spec.BoldMessage)
 	builder.WriteString(`</g>`)
 }
 
-func writeText(builder *strings.Builder, text string, x, y, width float64, color string, bold bool) {
+func writeText(builder *strings.Builder, text string, x, y, width float64, color string, letterSpacing float64, bold bool) {
 	builder.WriteString(`<text x="`)
 	builder.WriteString(number(x))
 	builder.WriteString(`" y="`)
 	builder.WriteString(number(y))
 	builder.WriteString(`" textLength="`)
 	builder.WriteString(number(width))
-	builder.WriteString(`" lengthAdjust="spacing" fill="#`)
+	builder.WriteString(`" lengthAdjust="spacing"`)
+	if letterSpacing != 0 {
+		builder.WriteString(` letter-spacing="`)
+		builder.WriteString(number(letterSpacing))
+		builder.WriteByte('"')
+	}
+	builder.WriteString(` fill="#`)
 	builder.WriteString(color)
 	builder.WriteByte('"')
 	if bold {
@@ -152,7 +160,7 @@ func writeText(builder *strings.Builder, text string, x, y, width float64, color
 	builder.WriteString(`</text>`)
 }
 
-func measureText(text string, fontSize float64) float64 {
+func measureText(text string, fontSize, letterSpacing float64) float64 {
 	width := float64(badgeTextWidth.StringWidth(text)) * 0.62
 	for _, char := range text {
 		if char >= utf8.RuneSelf {
@@ -165,7 +173,19 @@ func measureText(text string, fontSize float64) float64 {
 			width += 0.30
 		}
 	}
-	return math.Max(width*fontSize, fontSize*0.5)
+	return math.Max(width*fontSize+letterSpacingWidth(text, letterSpacing), fontSize*0.5)
+}
+
+func letterSpacingWidth(text string, letterSpacing float64) float64 {
+	if letterSpacing == 0 || text == "" {
+		return 0
+	}
+	clusters := 0
+	iterator := graphemes.FromString(text)
+	for iterator.Next() {
+		clusters++
+	}
+	return float64(max(0, clusters-1)) * letterSpacing
 }
 
 func accessibleLabel(label, message string) string {

@@ -16,7 +16,7 @@ const (
 var oldSchoolStyle = styleSpec{Height: oldSchoolHeight, Uppercase: true, Kind: "old-school", Render: renderOldSchool}
 
 func renderOldSchool(options Options, label, message string) []byte {
-	labelPanelWidth, messagePanelWidth, totalWidth := calculateOldSchoolWidths(label, message)
+	labelPanelWidth, messagePanelWidth, totalWidth := calculateOldSchoolWidths(label, message, options.LetterSpacing)
 	var builder strings.Builder
 	builder.Grow(2200)
 
@@ -51,21 +51,21 @@ func renderOldSchool(options Options, label, message string) []byte {
 	writeOldSchoolPanel(&builder, messageX, messagePanelWidth, options.MessageColor)
 
 	if labelPanelWidth > 0 {
-		writeAdaptiveText(&builder, label, adaptiveTextBox{X: 3, Y: 2, Width: float64(labelPanelWidth - 2), Height: 11, MaxFontSize: 7}, options.LabelTextColor, false, true)
+		writeAdaptiveText(&builder, label, adaptiveTextBox{X: 3, Y: 2, Width: float64(labelPanelWidth - 2), Height: 11, MaxFontSize: 7}, options.LabelTextColor, options.LetterSpacing, false, true)
 	}
-	writeAdaptiveText(&builder, message, adaptiveTextBox{X: float64(messageX + 1), Y: 2, Width: float64(messagePanelWidth - 2), Height: 11, MaxFontSize: 7}, options.MessageTextColor, false, true)
+	writeAdaptiveText(&builder, message, adaptiveTextBox{X: float64(messageX + 1), Y: 2, Width: float64(messagePanelWidth - 2), Height: 11, MaxFontSize: 7}, options.MessageTextColor, options.LetterSpacing, false, true)
 	builder.WriteString(`</g></svg>`)
 	return []byte(builder.String())
 }
 
-func calculateOldSchoolWidths(label, message string) (int, int, int) {
+func calculateOldSchoolWidths(label, message string, letterSpacing float64) (int, int, int) {
 	const (
 		borderAndGaps = 5 // 2px left border + 1px gap + 2px right border
 		minPanelWidth = 9
 	)
 
 	if label == "" {
-		messageNeeded := int(math.Ceil(measureText(strings.ToUpper(message), 7))) + 4
+		messageNeeded := int(math.Ceil(measureText(strings.ToUpper(message), 7, letterSpacing))) + 4
 		messagePanelWidth := max(messageNeeded, 20)
 		totalWidth := messagePanelWidth + 4 // 2px border each side
 		totalWidth = max(oldSchoolMinWidth, min(totalWidth, oldSchoolMaxWidth))
@@ -73,8 +73,8 @@ func calculateOldSchoolWidths(label, message string) (int, int, int) {
 		return 0, messagePanelWidth, totalWidth
 	}
 
-	labelNeeded := int(math.Ceil(measureText(strings.ToUpper(label), 7))) + 4
-	messageNeeded := int(math.Ceil(measureText(strings.ToUpper(message), 7))) + 4
+	labelNeeded := int(math.Ceil(measureText(strings.ToUpper(label), 7, letterSpacing))) + 4
+	messageNeeded := int(math.Ceil(measureText(strings.ToUpper(message), 7, letterSpacing))) + 4
 
 	// Calculate ideal total width
 	idealTotal := labelNeeded + messageNeeded + borderAndGaps
