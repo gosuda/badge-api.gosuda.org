@@ -11,7 +11,7 @@ COPY src ./src
 COPY static ./static
 RUN npm run build:web
 
-FROM golang:1.26-alpine AS go-builder
+FROM golang:1.27-alpine AS go-builder
 WORKDIR /src
 
 COPY go.mod go.sum ./
